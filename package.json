@@ -1,0 +1,32 @@
+{
+  "name": "memorie",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch": "webpack-dev-server --hot --inline --content-base ./public",
+    "build": "webpack && uglifyjs public/app.js --compress --mangle --output public/app.js",
+    "test": "standard"
+  },
+  "author": "Erick Merchant <erick.merchant@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.3.26",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015-riot": "^1.0.1",
+    "standard": "^5.4.1",
+    "tag-loader": "^0.3.0",
+    "uglifyjs": "^2.4.10",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
+  },
+  "dependencies": {
+    "moment": "^2.10.6",
+    "riot": "^2.3.12"
+  },
+  "standard": {
+    "ignore": [
+      "/public"
+    ]
+  }
+}
