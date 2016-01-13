@@ -2,9 +2,9 @@
   "name": "memorie",
   "private": true,
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "js/app.js",
   "scripts": {
-    "watch": "webpack-dev-server --hot --inline --content-base ./public",
+    "watch": "webpack --watch",
     "build": "webpack && uglifyjs public/app.js --compress --mangle --output public/app.js",
     "test": "standard"
   },
@@ -14,16 +14,14 @@
     "babel-core": "^6.3.26",
     "babel-loader": "^6.2.0",
     "babel-preset-es2015-riot": "^1.0.1",
+    "node-pg-migrate": "0.0.9",
+    "riot": "^2.3.12",
     "standard": "^5.4.1",
     "tag-loader": "^0.3.0",
     "uglifyjs": "^2.4.10",
-    "webpack": "^1.12.9",
-    "webpack-dev-server": "^1.14.0"
+    "webpack": "^1.12.9"
   },
-  "dependencies": {
-    "moment": "^2.10.6",
-    "riot": "^2.3.12"
-  },
+  "dependencies": {},
   "standard": {
     "ignore": [
       "/public"
