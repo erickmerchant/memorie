@@ -6,7 +6,8 @@
   "scripts": {
     "watch": "webpack --watch",
     "build": "webpack && uglifyjs public/app.js --compress --mangle --output public/app.js",
-    "test": "standard"
+    "test": "standard",
+    "start": "node -r dotenv/config index.js"
   },
   "author": "Erick Merchant <erick.merchant@gmail.com>",
   "license": "MIT",
@@ -14,6 +15,7 @@
     "babel-core": "^6.3.26",
     "babel-loader": "^6.2.0",
     "babel-preset-es2015-riot": "^1.0.1",
+    "dotenv": "^1.2.0",
     "node-pg-migrate": "0.0.9",
     "riot": "^2.3.12",
     "standard": "^5.4.1",
@@ -21,7 +23,13 @@
     "uglifyjs": "^2.4.10",
     "webpack": "^1.12.9"
   },
-  "dependencies": {},
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "express": "^4.13.3",
+    "express-static": "^1.0.3",
+    "morgan": "^1.6.1",
+    "pg": "^4.4.3"
+  },
   "standard": {
     "ignore": [
       "/public"
