@@ -15,29 +15,20 @@ exports.up = function (pgm) {
       references: 'account (id)'
     },
     title: 'text',
-    copy: 'text'
+    description: 'text'
   })
+
+  pgm.createType('status', ['incomplete', 'complete'])
 
   pgm.createTable('item', {
     id: 'id',
     list_id: {
       type: 'int',
       references: 'list (id)'
-    }
-  })
-
-  pgm.createType('status', ['created', 'started', 'halted', 'blocked', 'completed'])
-
-  pgm.createTable('item_version', {
-    id: 'id',
-    item_id: {
-      type: 'int',
-      references: 'item (id)'
     },
-    ordinal: 'int',
+    position: 'int',
     status: 'status',
-    value: 'text',
-    time: 'timestamp'
+    value: 'text'
   })
 }
 
