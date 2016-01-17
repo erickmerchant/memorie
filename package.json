@@ -24,6 +24,8 @@
     "webpack": "^1.12.9"
   },
   "dependencies": {
+    "assert-plus": "^0.2.0",
+    "bcrypt": "^0.8.5",
     "body-parser": "^1.14.2",
     "express": "^4.13.3",
     "express-static": "^1.0.3",

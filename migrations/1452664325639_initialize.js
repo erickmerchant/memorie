@@ -5,8 +5,7 @@ exports.up = function (pgm) {
       type: 'text',
       unique: true
     },
-    password: 'text',
-    salt: 'text'
+    password: 'text'
   })
 
   pgm.createTable('list', {
@@ -24,18 +23,18 @@ exports.up = function (pgm) {
     list_id: {
       type: 'int',
       references: 'list (id)'
-    },
-    value: 'text'
+    }
   })
 
-  pgm.createType('status', ['created', 'started', 'halted', 'stalled', 'blocked', 'completed'])
+  pgm.createType('status', ['created', 'started', 'halted', 'blocked', 'completed'])
 
-  pgm.createTable('action', {
+  pgm.createTable('item_version', {
     id: 'id',
     item_id: {
       type: 'int',
       references: 'item (id)'
     },
+    ordinal: 'int',
     status: 'status',
     value: 'text',
     time: 'timestamp'
