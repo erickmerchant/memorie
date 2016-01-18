@@ -10,15 +10,11 @@ exports.up = function (pgm) {
 
   pgm.createTable('list', {
     id: 'id',
-    account_id: {
-      type: 'int',
-      references: 'account (id)'
-    },
     title: 'text',
     description: 'text'
   })
 
-  pgm.createType('status', ['incomplete', 'complete'])
+  pgm.createType('status', require('../statuses.js'))
 
   pgm.createTable('item', {
     id: 'id',
@@ -26,7 +22,6 @@ exports.up = function (pgm) {
       type: 'int',
       references: 'list (id)'
     },
-    position: 'int',
     status: 'status',
     value: 'text'
   })
