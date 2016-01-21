@@ -1,0 +1,5 @@
+@import 'basscss';
+
+:root {
+  --container-width: 40em;
+}

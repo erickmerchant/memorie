@@ -120,7 +120,7 @@ app.command('account:update')
             if (err) {
               reject(err)
             } else {
-              resolve('account ' + result.rows[0].id + ' updated')
+              resolve('account ' + id + ' updated')
             }
 
             client.end()

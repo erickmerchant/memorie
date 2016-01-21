@@ -6,10 +6,12 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const assert = require('assert-plus')
 const pg = require('pg')
+const path = require('path')
 const statuses = require('./statuses.js')
 const app = express()
 const databaseURL = process.env.DATABASE_URL
 const port = process.env.PORT
+const directory = process.env.DIRECTORY
 
 pg.connect(databaseURL, function (err, client) {
   if (err) {
@@ -22,7 +24,7 @@ pg.connect(databaseURL, function (err, client) {
 
   app.use(morgan('dev'))
 
-  app.use(_static('./public'))
+  app.use(_static(directory))
 
   app.get('/api/list', function (req, res, next) {
     client.query('SELECT id, title, description FROM list', function (err, result) {
@@ -197,6 +199,16 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
+  app.use('/api/*', function (req, res, next) {
+    res.status(404)
+
+    res.json({error: 'Route not found'})
+  })
+
+  app.use(function (req, res, next) {
+    res.sendFile(path.resolve(directory, 'index.html'))
+  })
+
   app.use(function (err, req, res, next) {
     if (res.headersSent) {
       return next(err)
@@ -204,12 +216,6 @@ pg.connect(databaseURL, function (err, client) {
 
     res.status(500)
     res.json({error: err.message})
-  })
-
-  app.use(function (req, res, next) {
-    res.status(404)
-
-    res.json({error: 'Route not found'})
   })
 
   app.listen(port, function () {
