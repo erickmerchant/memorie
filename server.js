@@ -106,24 +106,22 @@ pg.connect(databaseURL, function (err, client) {
       } else {
         res.status(200)
 
-        res.json(result.rows[0])
+        var list = result.rows[0]
+
+        client.query('SELECT id, list_id, status, value FROM item WHERE list_id = $1', [req.params.id], function (err, result) {
+          if (err) {
+            next(err)
+          } else {
+            list.items = result.rows
+
+            res.json(list)
+          }
+        })
       }
     })
   })
 
-  app.get('/api/list/:id/item', function (req, res, next) {
-    assert.ok(Number.isInteger(+req.params.id) !== false, 'ID must be an integer')
-
-    client.query('SELECT id, list_id, status, value FROM item WHERE list_id = $1', [req.params.id], function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.json(result.rows)
-      }
-    })
-  })
-
-  app.post('/api/list/:id/item', function (req, res, next) {
+  app.post('/api/list/:id', function (req, res, next) {
     assert.ok(Number.isInteger(+req.params.id) !== false, 'ID must be an integer')
     assert.ok(req.body.status, 'Status is required')
     assert.ok(statuses.contains(req.body.status) !== false, 'Status must be one of [' + statuses.join(', ') + ']')
@@ -205,7 +203,7 @@ pg.connect(databaseURL, function (err, client) {
     res.json({error: 'Route not found'})
   })
 
-  app.use(function (req, res, next) {
+  app.use('/', function (req, res, next) {
     res.sendFile(path.resolve(directory, 'index.html'))
   })
 

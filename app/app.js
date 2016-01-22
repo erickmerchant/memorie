@@ -1,31 +1,40 @@
 /* global fetch */
 
+import './components/lists.tag'
 import './components/list.tag'
 import riot from 'riot'
 
 const main = document.querySelector('main')
 
-riot.route.base('')
+riot.route('', function () { riot.route('/list/') })
 
-riot.route('/', list)
-riot.route('/list/', list)
-
-riot.route.start(true)
-
-function list () {
+riot.route('list/', function () {
   fetch('/api/list/')
   .then(checkStatus)
   .then(parseJSON)
-  .then(function (list) {
-    console.log(list)
+  .then(function (lists) {
+    main.innerHTML = '<lists></lists>'
 
-    main.innerHTML = '<list></list>'
-
-    riot.mount('list', {list})
+    riot.mount('lists', {lists})
 
     riot.update()
   })
-}
+})
+
+riot.route('list/*', function (id) {
+  fetch('/api/list/' + id + '/')
+  .then(checkStatus)
+  .then(parseJSON)
+  .then(function (list) {
+    main.innerHTML = '<list></list>'
+
+    riot.mount('list', list)
+
+    riot.update()
+  })
+})
+
+riot.route.start(true)
 
 function checkStatus (response) {
   if (response.status >= 200 && response.status < 400) {

@@ -7,7 +7,7 @@
     "watch": "webpack --watch & postcss -c postcss.config.js -w",
     "build": "postcss -c postcss.config.js && postcss -u cssnano public/app.css -o public/app.css && webpack && uglifyjs public/app.js --compress --mangle --output public/app.js",
     "test": "standard",
-    "start": "node -r dotenv/config api.js"
+    "serve": "node -r dotenv/config server.js"
   },
   "author": "Erick Merchant <erick.merchant@gmail.com>",
   "license": "MIT",
