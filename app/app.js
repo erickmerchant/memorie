@@ -7,7 +7,9 @@ import riot from 'riot'
 
 const main = document.querySelector('main')
 
-riot.route('', function () { riot.route('/list/') })
+riot.route.base('/')
+
+riot.route('', function () { riot.route('list/') })
 
 riot.route('list/', function () {
   fetch('/api/list/')
