@@ -14,8 +14,8 @@
   border-width: var(--space-4);
 }
 
-.icon svg {
-  height: 1em;
+.btn .fa {
+  margin-right: var(--space-1);
 }
 
 :root {
