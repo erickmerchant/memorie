@@ -1,4 +1,22 @@
 @import 'basscss';
+@import 'basscss-border-colors';
+
+.border-1 {
+  border-width: var(--space-1);
+}
+.border-2 {
+  border-width: var(--space-2);
+}
+.border-3 {
+  border-width: var(--space-3);
+}
+.border-4 {
+  border-width: var(--space-4);
+}
+
+.icon svg {
+  height: 1em;
+}
 
 :root {
   --container-width: 40em;

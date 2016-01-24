@@ -1,5 +1,6 @@
 /* global fetch */
 
+import './components/icon.tag'
 import './components/lists.tag'
 import './components/list.tag'
 import riot from 'riot'
