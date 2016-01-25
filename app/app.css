@@ -14,8 +14,8 @@
   border-width: var(--space-4);
 }
 
-.btn .fa {
-  margin-right: var(--space-1);
+.cursor-pointer {
+  cursor: pointer;
 }
 
 :root {
