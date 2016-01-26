@@ -8,22 +8,16 @@ exports.up = function (pgm) {
     password: 'text'
   })
 
-  pgm.createTable('list', {
+  pgm.createTable('task', {
     id: 'id',
     title: 'text',
-    description: 'text'
-  })
-
-  pgm.createType('status', require('../statuses.js'))
-
-  pgm.createTable('item', {
-    id: 'id',
-    list_id: {
+    content: 'text',
+    closed: 'bool',
+    deadline: 'timestamp',
+    account_id: {
       type: 'int',
-      references: 'list (id)'
-    },
-    status: 'status',
-    value: 'text'
+      references: 'account (id)'
+    }
   })
 }
 
