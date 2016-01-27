@@ -7,15 +7,27 @@ const morgan = require('morgan')
 const assert = require('assert-plus')
 const pg = require('pg')
 const path = require('path')
+const session = require('express-session')
+const FileStore = require('session-file-store')(session)
 const app = express()
 const databaseURL = process.env.DATABASE_URL
 const port = process.env.PORT
 const directory = process.env.DIRECTORY
+const sessionSecret = process.env.SESSION_SECRET
 
 pg.connect(databaseURL, function (err, client) {
   if (err) {
     return console.error('error fetching client from pool', err)
   }
+
+  app.use(session({
+    store: new FileStore({
+      path: 'storage/session/'
+    }),
+    secret: sessionSecret,
+    resave: true,
+    saveUninitialized: true
+  }))
 
   app.use(bodyParser.urlencoded({extended: true}))
 
@@ -26,7 +38,7 @@ pg.connect(databaseURL, function (err, client) {
   app.use(_static(directory))
 
   app.get('/api/task', function (req, res, next) {
-    client.query('SELECT id, title, description FROM task', function (err, result) {
+    client.query('SELECT title, content, deadline FROM task WHERE account_id = $1 AND closed = false', [req.session.account_id], function (err, result) {
       if (err) {
         next(err)
       } else {

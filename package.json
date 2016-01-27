@@ -45,9 +45,11 @@
     "bcrypt": "^0.8.5",
     "body-parser": "^1.14.2",
     "express": "^4.13.3",
+    "express-session": "^1.13.0",
     "express-static": "^1.0.3",
     "morgan": "^1.6.1",
-    "pg": "^4.4.3"
+    "pg": "^4.4.3",
+    "session-file-store": "0.0.24"
   },
   "standard": {
     "ignore": [
