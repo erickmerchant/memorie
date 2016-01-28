@@ -31,7 +31,7 @@
     "postcss-custom-media": "^5.0.0",
     "postcss-custom-properties": "^5.0.0",
     "postcss-discard-comments": "^2.0.3",
-    "postcss-import": "^7.1.3",
+    "postcss-import": "^8.0.2",
     "riot": "^2.3.12",
     "sergeant": "^10.0.0",
     "standard": "^5.4.1",
@@ -41,7 +41,7 @@
     "whatwg-fetch": "^0.11.0"
   },
   "dependencies": {
-    "assert-plus": "^0.2.0",
+    "assert-plus": "^1.0.0",
     "bcrypt": "^0.8.5",
     "body-parser": "^1.14.2",
     "express": "^4.13.3",
