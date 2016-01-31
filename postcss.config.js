@@ -9,5 +9,5 @@ module.exports = {
     'autoprefixer'
   ],
   input: 'app/app.css',
-  dir: 'public'
+  dir: 'static'
 }

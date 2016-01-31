@@ -1,5 +1,7 @@
 'use strict'
 
+require('dotenv').config()
+
 const sergeant = require('sergeant')
 const app = sergeant().describe('CLI for memorie')
 const bcrypt = require('bcrypt')
