@@ -1,4 +1,6 @@
-exports.up = function (pgm) {
+const fs = require('fs')
+
+exports.up = function (pgm, cb) {
   pgm.createTable('account', {
     id: 'id',
     name: {
@@ -18,6 +20,14 @@ exports.up = function (pgm) {
       type: 'int',
       references: 'account (id)'
     }
+  })
+
+  fs.readFile('node_modules/connect-pg-simple/table.sql', 'utf8', function (err, sql) {
+    if (err) throw err
+
+    pgm.sql(sql)
+
+    cb()
   })
 }
 

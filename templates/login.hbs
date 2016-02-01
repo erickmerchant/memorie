@@ -1,30 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Memorie</title>
-    <link rel="stylesheet" href="/app.css">
-  </head>
+  {{> head}}
   <body>
-    <div class="clearfix white bg-gray p2 bold">
-      <div class="left">
-        <span>Memorie</span>
-      </div>
-    </div>
+    {{> menu}}
     <main class="container">
       <form class="clearfix" method="post" action="/login/">
         <div class="col col-12 p1">
           <h1>
             Please log in
           </h1>
+          {{#error}}
+            <div class="bold center p2 mb2 white bg-red rounded">
+              {{.}}
+            </div>
+          {{/error}}
         </div>
         <div class="col col-12 sm-col sm-col-6 p1">
           <label for="name-field">Name</label>
-          <input type="text" class="block col-12 mb1 field" id="name-field" name="name">
+          <input type="text" class="block col-12 mt1 mb2 field" id="name-field" name="name">
         </div>
         <div class="col col-12 sm-col sm-col-6 p1">
           <label for="password-field">Password</label>
-          <input type="password" class="block col-12 mb1 field" id="password-field" name="password">
+          <input type="password" class="block col-12 mt1 mb2 field" id="password-field" name="password">
         </div>
         <div class="col col-12 center p1">
           <button class="btn btn-primary col-6 py2">Log In</button>

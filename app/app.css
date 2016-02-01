@@ -19,5 +19,6 @@
 }
 
 :root {
+  --font-family: 'Montserrat';
   --container-width: 40em;
 }

@@ -7,13 +7,14 @@ const templateDirectory = process.env.TEMPLATE_DIRECTORY
 const sessionSecret = process.env.SESSION_SECRET
 const bcrypt = require('bcrypt')
 const express = require('express')
+const compression = require('compression')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const assert = require('assert-plus')
 const pg = require('pg')
-const path = require('path')
+const hbs = require('hbs')
 const session = require('express-session')
-const FileStore = require('session-file-store')(session)
+const PgStore = require('connect-pg-simple')(session)
 const app = express()
 
 pg.connect(databaseURL, function (err, client) {
@@ -21,9 +22,17 @@ pg.connect(databaseURL, function (err, client) {
     return console.error('error fetching client from pool', err)
   }
 
+  hbs.registerPartials(templateDirectory + '/partials')
+
+  app.set('view engine', 'hbs')
+  app.set('views', templateDirectory)
+  app.set('x-powered-by', false)
+
+  app.use(compression())
+
   app.use(session({
-    store: new FileStore({
-      path: 'storage/session/'
+    store: new PgStore({
+      pg: pg
     }),
     name: 'memorie',
     secret: sessionSecret,
@@ -39,7 +48,7 @@ pg.connect(databaseURL, function (err, client) {
   app.use(morgan('dev'))
 
   app.get('/api/task', function (req, res, next) {
-    client.query('SELECT title, content, deadline FROM task WHERE account_id = $1 AND closed = false', [req.session.account_id], function (err, result) {
+    client.query('SELECT title, content, deadline FROM task WHERE account_id = $1 AND closed = false ORDER BY deadline ASC', [req.session.account_id], function (err, result) {
       if (err) {
         next(err)
       } else {
@@ -143,38 +152,103 @@ pg.connect(databaseURL, function (err, client) {
   app.post('/login', function (req, res, next) {
     if (req.body.name && req.body.password) {
       client.query('SELECT id, password FROM account WHERE name = $1', [req.body.name], function (err, result) {
-        if (err) throw err
-
-        if (result.rows && result.rows.length) {
-          bcrypt.compare(req.body.password, result.rows[0].password, function (err, same) {
-            if (err) throw err
-
-            if (same) {
-              req.session.account_id = result.rows[0].id
-            }
-
-            res.redirect('/')
-          })
+        if (err) {
+          next(err)
         } else {
-          res.redirect('/')
+          if (result.rows && result.rows.length) {
+            bcrypt.compare(req.body.password, result.rows[0].password, function (err, same) {
+              if (err) {
+                next(err)
+              } else {
+                let dest = '/login'
+
+                if (same) {
+                  req.session.account_id = result.rows[0].id
+
+                  dest = '/'
+                } else {
+                  req.session.error = 'Name or password are incorrect'
+                }
+
+                req.session.save(function (err) {
+                  if (err) {
+                    next(err)
+                  } else {
+                    res.redirect(dest)
+                  }
+                })
+              }
+            })
+          } else {
+            req.session.error = 'Name or password are incorrect'
+
+            req.session.save(function (err) {
+              if (err) {
+                next(err)
+              } else {
+                res.redirect('/login')
+              }
+            })
+          }
         }
       })
     } else {
-      res.redirect('/')
+      req.session.error = 'Name and password required'
+
+      req.session.save(function (err) {
+        if (err) {
+          next(err)
+        } else {
+          res.redirect('/login')
+        }
+      })
     }
   })
 
   app.get('/logout', function (req, res, next) {
-    req.session.account_id = null
+    delete req.session.account_id
 
-    res.redirect('/')
+    req.session.save(function (err) {
+      if (err) {
+        next(err)
+      } else {
+        res.redirect('/login')
+      }
+    })
+  })
+
+  app.get('/login', function (req, res, next) {
+    res.render('login', {error: req.session.error || false}, function (err, html) {
+      if (err) {
+        next(err)
+      } else {
+        delete req.session.error
+
+        req.session.save(function (err) {
+          if (err) {
+            next(err)
+          } else {
+            res.send(html)
+          }
+        })
+      }
+    })
+  })
+
+  app.use(function (err, req, res, next) {
+    if (res.headersSent) {
+      return next(err)
+    }
+
+    res.status(500)
+    res.render('error')
   })
 
   app.use(function (req, res, next) {
     if (!req.session.account_id) {
-      res.sendFile(path.resolve(templateDirectory, 'login.html'))
+      res.redirect('/login')
     } else {
-      res.sendFile(path.resolve(templateDirectory, 'index.html'))
+      res.render('index')
     }
   })
 

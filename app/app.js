@@ -1,6 +1,6 @@
 import './components/tasks.tag'
-import view from './view.js'
 import riot from 'riot'
+const main = document.querySelector('main')
 
 riot.route.base('/')
 
@@ -21,7 +21,15 @@ riot.route('tasks/*', function (id) {
 riot.route('logout', function () {
   riot.route.stop()
 
-  window.location.replace('/logout/')
+  window.location.reload(true)
 })
 
 riot.route.start(true)
+
+function view (tag, data) {
+  main.innerHTML = '<' + tag + '></' + tag + '>'
+
+  riot.mount(tag, data)
+
+  riot.update()
+}
