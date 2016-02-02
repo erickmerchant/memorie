@@ -1,16 +1,17 @@
 'use strict'
 
-const databaseURL = process.env.DATABASE_URL
 const port = process.env.PORT
+const databaseURL = process.env.DATABASE_URL
 const staticDirectory = process.env.STATIC_DIRECTORY
 const templateDirectory = process.env.TEMPLATE_DIRECTORY
 const sessionSecret = process.env.SESSION_SECRET
 const bcrypt = require('bcrypt')
 const express = require('express')
 const compression = require('compression')
+const flash = require('simple-express-flash')
 const bodyParser = require('body-parser')
-const morgan = require('morgan')
 const assert = require('assert-plus')
+const morgan = require('morgan')
 const pg = require('pg')
 const hbs = require('hbs')
 const session = require('express-session')
@@ -41,6 +42,8 @@ pg.connect(databaseURL, function (err, client) {
     unset: 'destroy'
   }))
 
+  app.use(flash)
+
   app.use(bodyParser.urlencoded({extended: true}))
 
   app.use(bodyParser.json())
@@ -48,7 +51,7 @@ pg.connect(databaseURL, function (err, client) {
   app.use(morgan('dev'))
 
   app.get('/api/task', function (req, res, next) {
-    client.query('SELECT title, content, deadline FROM task WHERE account_id = $1 AND closed = false ORDER BY deadline ASC', [req.session.account_id], function (err, result) {
+    client.query('SELECT title, content, deadline FROM task WHERE account_id = $1 AND closed = false ORDER BY deadline DESC', [req.session.account_id], function (err, result) {
       if (err) {
         next(err)
       } else {
@@ -151,49 +154,9 @@ pg.connect(databaseURL, function (err, client) {
 
   app.post('/login', function (req, res, next) {
     if (req.body.name && req.body.password) {
-      client.query('SELECT id, password FROM account WHERE name = $1', [req.body.name], function (err, result) {
-        if (err) {
-          next(err)
-        } else {
-          if (result.rows && result.rows.length) {
-            bcrypt.compare(req.body.password, result.rows[0].password, function (err, same) {
-              if (err) {
-                next(err)
-              } else {
-                let dest = '/login'
-
-                if (same) {
-                  req.session.account_id = result.rows[0].id
-
-                  dest = '/'
-                } else {
-                  req.session.error = 'Name or password are incorrect'
-                }
-
-                req.session.save(function (err) {
-                  if (err) {
-                    next(err)
-                  } else {
-                    res.redirect(dest)
-                  }
-                })
-              }
-            })
-          } else {
-            req.session.error = 'Name or password are incorrect'
-
-            req.session.save(function (err) {
-              if (err) {
-                next(err)
-              } else {
-                res.redirect('/login')
-              }
-            })
-          }
-        }
-      })
+      next()
     } else {
-      req.session.error = 'Name and password required'
+      req.flash('error', 'Name and password required')
 
       req.session.save(function (err) {
         if (err) {
@@ -203,6 +166,51 @@ pg.connect(databaseURL, function (err, client) {
         }
       })
     }
+  }, function (req, res, next) {
+    client.query('SELECT id, password FROM account WHERE name = $1', [req.body.name], function (err, result) {
+      if (err) {
+        next(err)
+      } else {
+        if (result.rows && result.rows.length) {
+          req.user = result.rows[0]
+          next()
+        } else {
+          req.flash('error', 'Name or password are incorrect')
+
+          req.session.save(function (err) {
+            if (err) {
+              next(err)
+            } else {
+              res.redirect('/login')
+            }
+          })
+        }
+      }
+    })
+  }, function (req, res, next) {
+    bcrypt.compare(req.body.password, req.user.password, function (err, same) {
+      if (err) {
+        next(err)
+      } else {
+        let dest = '/login'
+
+        if (same) {
+          req.session.account_id = req.user.id
+
+          dest = '/'
+        } else {
+          req.flash('error', 'Name or password are incorrect')
+        }
+
+        req.session.save(function (err) {
+          if (err) {
+            next(err)
+          } else {
+            res.redirect(dest)
+          }
+        })
+      }
+    })
   })
 
   app.get('/logout', function (req, res, next) {
@@ -218,19 +226,11 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.get('/login', function (req, res, next) {
-    res.render('login', {error: req.session.error || false}, function (err, html) {
+    res.render('login', {error: req.flash('error') || []}, function (err, html) {
       if (err) {
         next(err)
       } else {
-        delete req.session.error
-
-        req.session.save(function (err) {
-          if (err) {
-            next(err)
-          } else {
-            res.send(html)
-          }
-        })
+        res.send(html)
       }
     })
   })
