@@ -51,7 +51,7 @@ pg.connect(databaseURL, function (err, client) {
   app.use(morgan('dev'))
 
   app.get('/api/task', function (req, res, next) {
-    client.query('SELECT title, content, deadline FROM task WHERE account_id = $1 AND closed = false ORDER BY deadline DESC', [req.session.account_id], function (err, result) {
+    client.query('SELECT title, content FROM task WHERE account_id = $1 AND closed = false ORDER BY id ASC', [req.session.account_id], function (err, result) {
       if (err) {
         next(err)
       } else {

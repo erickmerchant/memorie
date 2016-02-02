@@ -15,7 +15,6 @@ exports.up = function (pgm, cb) {
     title: 'text',
     content: 'text',
     closed: 'bool',
-    deadline: 'timestamp',
     account_id: {
       type: 'int',
       references: 'account (id)'
