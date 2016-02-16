@@ -1,3 +1,3 @@
 <task-new>
-  <div>new</div>
+  <div>--new--</div>
 </task-new>

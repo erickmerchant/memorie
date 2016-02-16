@@ -24,8 +24,8 @@ app.command('account:list')
           reject(err)
         } else {
           if (result.rows.length) {
-            let longestId = String(Math.max.apply(null, result.rows.map(v => v.id))).length
-            let longestName = Math.max.apply(null, result.rows.map(v => v.name.length))
+            let longestId = String(Math.max.apply(null, result.rows.map((v) => v.id))).length
+            let longestName = Math.max.apply(null, result.rows.map((v) => v.name.length))
 
             longestId = longestId > 2 ? longestId : 2
 

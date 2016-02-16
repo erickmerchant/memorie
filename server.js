@@ -1,6 +1,6 @@
 'use strict'
 
-const port = process.env.PORT
+const port = process.env.PORT || 8000
 const databaseURL = process.env.DATABASE_URL
 const staticDirectory = process.env.STATIC_DIRECTORY
 const templateDirectory = process.env.TEMPLATE_DIRECTORY
@@ -13,7 +13,7 @@ const bodyParser = require('body-parser')
 const assert = require('assert-plus')
 const morgan = require('morgan')
 const pg = require('pg')
-const hbs = require('hbs')
+const atlatl = require('atlatl')({cacheDirectory: './storage/compiled/'})
 const session = require('express-session')
 const PgStore = require('connect-pg-simple')(session)
 const app = express()
@@ -23,9 +23,15 @@ pg.connect(databaseURL, function (err, client) {
     return console.error('error fetching client from pool', err)
   }
 
-  hbs.registerPartials(templateDirectory + '/partials')
+  app.engine('html', function (filePath, options, callback) {
+    atlatl(filePath)
+    .then(function (template) {
+      callback(null, template(options))
+    })
+    .catch(callback)
+  })
 
-  app.set('view engine', 'hbs')
+  app.set('view engine', 'html')
   app.set('views', templateDirectory)
   app.set('x-powered-by', false)
 
@@ -226,7 +232,7 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.get('/login', function (req, res, next) {
-    res.render('login', {error: req.flash('error') || []}, function (err, html) {
+    res.render('login', {hasLogout: false, error: req.flash('error') || []}, function (err, html) {
       if (err) {
         next(err)
       } else {
@@ -241,14 +247,14 @@ pg.connect(databaseURL, function (err, client) {
     }
 
     res.status(500)
-    res.render('error')
+    res.render('error', {hasLogout: false})
   })
 
   app.use(function (req, res, next) {
     if (!req.session.account_id) {
       res.redirect('/login')
     } else {
-      res.render('index')
+      res.render('index', {hasLogout: true})
     }
   })
 

@@ -2,9 +2,17 @@ const main = document.querySelector('main')
 import riot from 'riot'
 
 export default function (tag, data) {
-  main.innerHTML = '<' + tag + '></' + tag + '>'
+  var data = {}
 
-  riot.mount(tag, data)
+  return function (id) {
+    if (id) {
+      data.id = id
+    }
 
-  riot.update()
+    main.innerHTML = '<' + tag + '></' + tag + '>'
+
+    riot.mount(tag, data)
+
+    riot.update()
+  }
 }
