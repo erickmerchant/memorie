@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "js/app.js",
   "scripts": {
-    "watch": "webpack --watch & postcss -c postcss.config.js -w & nodemon --ignore ./storage/ -r dotenv/config server.js",
+    "watch": "webpack --watch & postcss -c postcss.config.js -w & nodemon -e js,html --ignore ./storage/ -r dotenv/config server.js",
     "build": "postcss -c postcss.config.js && postcss -u cssnano static/app.css -o static/app.css && webpack && uglifyjs static/app.js --compress --mangle --output static/app.js",
     "test": "standard",
     "serve": "node -r dotenv/config server.js"
