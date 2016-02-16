@@ -7,25 +7,6 @@
 @import 'basscss-forms';
 @import 'colors.css/myth/colors.css';
 
-.border-1 {
-  border-width: var(--space-1);
-}
-.border-2 {
-  border-width: var(--space-2);
-}
-.border-3 {
-  border-width: var(--space-3);
-}
-.border-4 {
-  border-width: var(--space-4);
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
 :root {
   --font-family: 'Montserrat';
-  --container-width: 40em;
-  --field-focus-color: var(--fuchsia);
 }
