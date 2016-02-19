@@ -18,6 +18,16 @@ const session = require('express-session')
 const PgStore = require('connect-pg-simple')(session)
 const app = express()
 
+function isLoggedIn (req, res, next) {
+  console.log(req.session.account_id)
+
+  if (!req.session.account_id) {
+    res.redirect('/login')
+  } else {
+    next()
+  }
+}
+
 pg.connect(databaseURL, function (err, client) {
   if (err) {
     return console.error('error fetching client from pool', err)
@@ -56,107 +66,12 @@ pg.connect(databaseURL, function (err, client) {
 
   app.use(morgan('dev'))
 
-  app.get('/api/task', function (req, res, next) {
-    client.query('SELECT title, content FROM task WHERE account_id = $1 AND closed = false ORDER BY id ASC', [req.session.account_id], function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.json(result.rows)
-      }
-    })
-  })
-
-  app.post('/api/task', function (req, res, next) {
-    assert.ok(req.body.title, 'Title is required')
-    assert.ok(req.body.description, 'Description is required')
-    assert.string(req.body.title, 'Title must be a string')
-    assert.string(req.body.description, 'Description must be a string')
-
-    client.query({
-      name: 'insert-task',
-      text: 'INSERT INTO task (title, description)  VALUES ($1, $2) RETURNING id',
-      values: [req.body.title, req.body.description]
-    }, function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.status(201)
-
-        res.json(result.rows[0])
-      }
-    })
-  })
-
-  app.put('/api/task/:id', function (req, res, next) {
-    assert.ok(Number.isInteger(+req.params.id) !== false, 'ID must be an integer')
-    assert.ok(req.body.title, 'Title is required')
-    assert.ok(req.body.description, 'Description is required')
-    assert.string(req.body.title, 'Title must be a string')
-    assert.string(req.body.description, 'Description must be a string')
-
-    client.query({
-      name: 'update-task',
-      text: 'UPDATE task SET title = $2, description = $3 WHERE id = $1',
-      values: [req.params.id, req.body.title, req.body.description]
-    }, function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.status(200)
-
-        res.send('')
-      }
-    })
-  })
-
-  app.delete('/api/task/:id', function (req, res, next) {
-    assert.ok(Number.isInteger(+req.params.id) !== false, 'ID must be an integer')
-
-    client.query({
-      name: 'delete-task',
-      text: 'DELETE FROM task WHERE id = $1',
-      values: [req.params.id]
-    }, function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.status(200)
-
-        res.send('')
-      }
-    })
-  })
-
-  app.get('/api/task/:id', function (req, res, next) {
-    assert.ok(Number.isInteger(+req.params.id) !== false, 'ID must be an integer')
-
-    client.query('SELECT id, title, description FROM task WHERE id = $1', [req.params.id], function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.status(200)
-
-        res.json(result.rows[0])
-      }
-    })
-  })
-
-  app.use('/api/*', function (req, res, next) {
-    res.status(404)
-
-    res.json({error: 'Route not found'})
-  })
-
-  app.use('/api/*', function (err, req, res, next) {
-    if (res.headersSent) {
-      return next(err)
-    }
-
-    res.status(500)
-    res.json({error: err.message})
-  })
-
   app.use(express.static(staticDirectory))
+
+  app.param('id', function (req, res, next, id) {
+    assert.ok(Number.isInteger(+id) !== false, 'ID must be an integer')
+    next()
+  })
 
   app.post('/login', function (req, res, next) {
     if (req.body.name && req.body.password) {
@@ -219,18 +134,6 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.get('/logout', function (req, res, next) {
-    delete req.session.account_id
-
-    req.session.save(function (err) {
-      if (err) {
-        next(err)
-      } else {
-        res.redirect('/login')
-      }
-    })
-  })
-
   app.get('/login', function (req, res, next) {
     res.render('login', {hasLogout: false, error: req.flash('error') || []}, function (err, html) {
       if (err) {
@@ -241,6 +144,118 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
+  app.get('/logout', function (req, res, next) {
+    req.session.account_id = null
+
+    req.session.destroy(function (err) {
+      if (err) {
+        next(err)
+      } else {
+        res.redirect('/login')
+      }
+    })
+  })
+
+  app.get('/api/task', isLoggedIn, function (req, res, next) {
+    client.query('SELECT title, content, closed FROM task WHERE account_id = $1 AND closed = false ORDER BY id ASC', [req.session.account_id], function (err, result) {
+      if (err) {
+        next(err)
+      } else {
+        res.json(result.rows)
+      }
+    })
+  })
+
+  app.post('/api/task', isLoggedIn, function (req, res, next) {
+    assert.ok(req.body.title, 'Title is required')
+    assert.ok(req.body.content, 'Description is required')
+    assert.string(req.body.title, 'Title must be a string')
+    assert.string(req.body.content, 'Description must be a string')
+
+    client.query({
+      name: 'insert-task',
+      text: 'INSERT INTO task (title, content, closed, account_id) VALUES ($1, $2, $3, $4) RETURNING id',
+      values: [req.body.title, req.body.content, req.body.closed, req.session.account_id]
+    }, function (err, result) {
+      if (err) {
+        next(err)
+      } else {
+        res.status(201)
+
+        res.json(result.rows[0])
+      }
+    })
+  })
+
+  app.put('/api/task/:id', isLoggedIn, function (req, res, next) {
+    assert.ok(req.body.title, 'Title is required')
+    assert.ok(req.body.content, 'Description is required')
+    assert.string(req.body.title, 'Title must be a string')
+    assert.string(req.body.content, 'Description must be a string')
+
+    client.query({
+      name: 'update-task',
+      text: 'UPDATE task SET title = $2, content = $3 WHERE id = $1',
+      values: [req.params.id, req.body.title, req.body.content]
+    }, function (err, result) {
+      if (err) {
+        next(err)
+      } else {
+        res.status(200)
+
+        res.send('')
+      }
+    })
+  })
+
+  app.delete('/api/task/:id', isLoggedIn, function (req, res, next) {
+    client.query({
+      name: 'delete-task',
+      text: 'DELETE FROM task WHERE id = $1',
+      values: [req.params.id]
+    }, function (err, result) {
+      if (err) {
+        next(err)
+      } else {
+        res.status(200)
+
+        res.send('')
+      }
+    })
+  })
+
+  app.get('/api/task/:id', isLoggedIn, function (req, res, next) {
+    client.query('SELECT id, title, content FROM task WHERE id = $1', [req.params.id], function (err, result) {
+      if (err) {
+        next(err)
+      } else {
+        res.status(200)
+
+        res.json(result.rows[0])
+      }
+    })
+  })
+
+  app.use('/api/*', isLoggedIn, function (req, res, next) {
+    res.status(404)
+
+    res.json({error: 'Route not found'})
+  })
+
+  app.use('/api/*', function (err, req, res, next) {
+    if (res.headersSent) {
+      return next(err)
+    }
+
+    res.status(500)
+    res.json({error: err.message})
+  })
+
+
+  app.use('*', isLoggedIn, function (req, res, next) {
+    res.render('index', {hasLogout: true})
+  })
+
   app.use(function (err, req, res, next) {
     if (res.headersSent) {
       return next(err)
@@ -248,14 +263,6 @@ pg.connect(databaseURL, function (err, client) {
 
     res.status(500)
     res.render('error', {hasLogout: false})
-  })
-
-  app.use(function (req, res, next) {
-    if (!req.session.account_id) {
-      res.redirect('/login')
-    } else {
-      res.render('index', {hasLogout: true})
-    }
   })
 
   app.listen(port, function () {

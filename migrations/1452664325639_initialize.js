@@ -1,4 +1,6 @@
 const fs = require('fs')
+const thenify = require('thenify')
+const readFile = thenify(fs.readFile)
 
 exports.up = function (pgm, cb) {
   pgm.createTable('account', {
@@ -21,13 +23,12 @@ exports.up = function (pgm, cb) {
     }
   })
 
-  fs.readFile('node_modules/connect-pg-simple/table.sql', 'utf8', function (err, sql) {
-    if (err) throw err
-
+  readFile('node_modules/connect-pg-simple/table.sql', 'utf8').then(function (sql) {
     pgm.sql(sql)
 
     cb()
   })
+  .catch(cb)
 }
 
 exports.down = function (pgm) {
