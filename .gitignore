@@ -1,5 +1,4 @@
 .env
 node_modules
-static/app.css
-static/app.js
-storage
+static
+*.html.js

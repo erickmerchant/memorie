@@ -3,19 +3,14 @@
   <head>
     <meta charset="UTF-8">
     <title>Memorie</title>
-    <link rel="stylesheet" href="/app.css">
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/app.css">
   </head>
   <body>
     <div class="clearfix white bg-maroon p2 bold">
       <div class="left">
         <span>Memorie</span>
       </div>
-      @if (content.hasLogout)
-        <div class="right">
-          <a class="white" target="_self" href="/logout/">Log Out</a>
-        </div>
-      @
     </div>
     <main class="max-width-4 mx-auto p2">
       @yield main

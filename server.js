@@ -4,29 +4,14 @@ const port = process.env.PORT || 8000
 const databaseURL = process.env.DATABASE_URL
 const staticDirectory = process.env.STATIC_DIRECTORY
 const templateDirectory = process.env.TEMPLATE_DIRECTORY
-const sessionSecret = process.env.SESSION_SECRET
-const bcrypt = require('bcrypt')
 const express = require('express')
 const compression = require('compression')
-const flash = require('simple-express-flash')
 const bodyParser = require('body-parser')
 const assert = require('assert-plus')
 const morgan = require('morgan')
 const pg = require('pg')
-const atlatl = require('atlatl')({cacheDirectory: './storage/compiled/'})
-const session = require('express-session')
-const PgStore = require('connect-pg-simple')(session)
+const atlatl = require('atlatl')({cacheDirectory: './compiled/'})
 const app = express()
-
-function isLoggedIn (req, res, next) {
-  console.log(req.session.account_id)
-
-  if (!req.session.account_id) {
-    res.redirect('/login')
-  } else {
-    next()
-  }
-}
 
 pg.connect(databaseURL, function (err, client) {
   if (err) {
@@ -36,7 +21,7 @@ pg.connect(databaseURL, function (err, client) {
   app.engine('html', function (filePath, options, callback) {
     atlatl(filePath)
     .then(function (template) {
-      callback(null, template(options))
+      callback(null, template.render(options))
     })
     .catch(callback)
   })
@@ -46,19 +31,6 @@ pg.connect(databaseURL, function (err, client) {
   app.set('x-powered-by', false)
 
   app.use(compression())
-
-  app.use(session({
-    store: new PgStore({
-      pg: pg
-    }),
-    name: 'memorie',
-    secret: sessionSecret,
-    resave: true,
-    saveUninitialized: true,
-    unset: 'destroy'
-  }))
-
-  app.use(flash)
 
   app.use(bodyParser.urlencoded({extended: true}))
 
@@ -73,91 +45,8 @@ pg.connect(databaseURL, function (err, client) {
     next()
   })
 
-  app.post('/login', function (req, res, next) {
-    if (req.body.name && req.body.password) {
-      next()
-    } else {
-      req.flash('error', 'Name and password required')
-
-      req.session.save(function (err) {
-        if (err) {
-          next(err)
-        } else {
-          res.redirect('/login')
-        }
-      })
-    }
-  }, function (req, res, next) {
-    client.query('SELECT id, password FROM account WHERE name = $1', [req.body.name], function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        if (result.rows && result.rows.length) {
-          req.user = result.rows[0]
-          next()
-        } else {
-          req.flash('error', 'Name or password are incorrect')
-
-          req.session.save(function (err) {
-            if (err) {
-              next(err)
-            } else {
-              res.redirect('/login')
-            }
-          })
-        }
-      }
-    })
-  }, function (req, res, next) {
-    bcrypt.compare(req.body.password, req.user.password, function (err, same) {
-      if (err) {
-        next(err)
-      } else {
-        let dest = '/login'
-
-        if (same) {
-          req.session.account_id = req.user.id
-
-          dest = '/'
-        } else {
-          req.flash('error', 'Name or password are incorrect')
-        }
-
-        req.session.save(function (err) {
-          if (err) {
-            next(err)
-          } else {
-            res.redirect(dest)
-          }
-        })
-      }
-    })
-  })
-
-  app.get('/login', function (req, res, next) {
-    res.render('login', {hasLogout: false, error: req.flash('error') || []}, function (err, html) {
-      if (err) {
-        next(err)
-      } else {
-        res.send(html)
-      }
-    })
-  })
-
-  app.get('/logout', function (req, res, next) {
-    req.session.account_id = null
-
-    req.session.destroy(function (err) {
-      if (err) {
-        next(err)
-      } else {
-        res.redirect('/login')
-      }
-    })
-  })
-
-  app.get('/api/task', isLoggedIn, function (req, res, next) {
-    client.query('SELECT title, content, closed FROM task WHERE account_id = $1 AND closed = false ORDER BY id ASC', [req.session.account_id], function (err, result) {
+  app.get('/api/task', function (req, res, next) {
+    client.query('SELECT * FROM task WHERE closed = false ORDER BY id ASC', function (err, result) {
       if (err) {
         next(err)
       } else {
@@ -166,16 +55,18 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.post('/api/task', isLoggedIn, function (req, res, next) {
+  app.post('/api/task', function (req, res, next) {
     assert.ok(req.body.title, 'Title is required')
     assert.ok(req.body.content, 'Description is required')
+    assert.ok(req.body.closed, 'Closed is required')
     assert.string(req.body.title, 'Title must be a string')
     assert.string(req.body.content, 'Description must be a string')
+    assert.bool(req.body.closed, 'Closed must be a bool')
 
     client.query({
       name: 'insert-task',
-      text: 'INSERT INTO task (title, content, closed, account_id) VALUES ($1, $2, $3, $4) RETURNING id',
-      values: [req.body.title, req.body.content, req.body.closed, req.session.account_id]
+      text: 'INSERT INTO task (title, content, closed) VALUES ($1, $2, $3) RETURNING id',
+      values: [req.body.title, req.body.content, req.body.closed]
     }, function (err, result) {
       if (err) {
         next(err)
@@ -187,16 +78,18 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.put('/api/task/:id', isLoggedIn, function (req, res, next) {
+  app.put('/api/task/:id', function (req, res, next) {
     assert.ok(req.body.title, 'Title is required')
     assert.ok(req.body.content, 'Description is required')
+    assert.ok(req.body.closed, 'Closed is required')
     assert.string(req.body.title, 'Title must be a string')
     assert.string(req.body.content, 'Description must be a string')
+    assert.bool(req.body.closed, 'Closed must be a bool')
 
     client.query({
       name: 'update-task',
-      text: 'UPDATE task SET title = $2, content = $3 WHERE id = $1',
-      values: [req.params.id, req.body.title, req.body.content]
+      text: 'UPDATE task SET title = $2, content = $3, closed = $4 WHERE id = $1',
+      values: [req.params.id, req.body.title, req.body.content, req.body.closed]
     }, function (err, result) {
       if (err) {
         next(err)
@@ -208,7 +101,7 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.delete('/api/task/:id', isLoggedIn, function (req, res, next) {
+  app.delete('/api/task/:id', function (req, res, next) {
     client.query({
       name: 'delete-task',
       text: 'DELETE FROM task WHERE id = $1',
@@ -224,8 +117,8 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.get('/api/task/:id', isLoggedIn, function (req, res, next) {
-    client.query('SELECT id, title, content FROM task WHERE id = $1', [req.params.id], function (err, result) {
+  app.get('/api/task/:id', function (req, res, next) {
+    client.query('SELECT * FROM task WHERE id = $1', [req.params.id], function (err, result) {
       if (err) {
         next(err)
       } else {
@@ -236,7 +129,7 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.use('/api/*', isLoggedIn, function (req, res, next) {
+  app.use('/api/*', function (req, res, next) {
     res.status(404)
 
     res.json({error: 'Route not found'})
@@ -251,9 +144,8 @@ pg.connect(databaseURL, function (err, client) {
     res.json({error: err.message})
   })
 
-
-  app.use('*', isLoggedIn, function (req, res, next) {
-    res.render('index', {hasLogout: true})
+  app.use('*', function (req, res, next) {
+    res.render('index')
   })
 
   app.use(function (err, req, res, next) {
@@ -262,7 +154,7 @@ pg.connect(databaseURL, function (err, client) {
     }
 
     res.status(500)
-    res.render('error', {hasLogout: false})
+    res.render('error')
   })
 
   app.listen(port, function () {

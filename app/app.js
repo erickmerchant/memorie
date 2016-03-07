@@ -1,21 +1,28 @@
-import './components/task-list.tag'
-import './components/task-edit.tag'
-import './components/task-new.tag'
-import riot from 'riot'
-import view from './view'
+var runtime = require('./runtime.js')
+var Template = require('./template.html.js')(runtime)
+var main = require('main-loop')
+var state = {
+  times: 0,
+  collection: []
+}
+var app = {
+  increment: function () {
+    state.times += 1
 
-riot.route.base('/')
+    state.collection.push(Math.random())
 
-riot.route('logout', function () {
-  riot.route.stop()
-
-  window.location.reload(true)
+    loop.update(state)
+  }
+}
+var loop = main(state, render, {
+  document: document,
+  create: require('virtual-dom/create-element'),
+  diff: require('virtual-dom/diff'),
+  patch: require('virtual-dom/patch')
 })
 
-riot.route('', view('task-list'))
+document.querySelector('main').appendChild(loop.target)
 
-riot.route('new', view('task-new'))
-
-riot.route('*', view('task-edit'))
-
-riot.route.start(true)
+function render (state) {
+  return (new Template()).render(state, app)
+}

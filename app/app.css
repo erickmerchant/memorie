@@ -1,11 +1,7 @@
 @import 'basscss-basic';
 @import 'basscss';
-@import 'basscss';
 @import 'basscss-btn';
 @import 'basscss-btn-primary';
-@import 'basscss-btn-sizes';
-@import 'basscss-forms';
-@import 'colors.css/src/colors.css';
 
 body {
   font-family: 'Montserrat';
