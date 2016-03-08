@@ -1,7 +1,9 @@
 /* global fetch */
 
-export default function (url) {
-  return fetch(url).then(checkStatus).then(parseJSON)
+require('whatwg-fetch')
+
+module.exports = function (url, options = {}) {
+  return fetch(url, options).then(checkStatus).then(parseJSON)
 }
 
 function checkStatus (response) {

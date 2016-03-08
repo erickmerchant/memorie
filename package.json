@@ -3,12 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "templates": "atlatl app/template.html --cache-directory app --variable 'state, app'",
+    "templates": "atlatl app/**/*.html --cache-directory app --variable 'state, app'",
+    "templates-watch": "atlatl --watch -- app/**/*.html --cache-directory app --variable 'state, app'",
     "js": "browserify -t [ babelify --presets [ es2015 ] ] app/app.js > static/app.js && uglifyjs static/app.js --compress --mangle --output static/app.js",
     "js-watch": "watchify -t [ babelify --presets [ es2015 ] ] -o static/app.js app/app.js",
     "css": "postcss -u postcss-import -u postcss-url -u postcss-cssnext -u cssnano -d static app/app.css",
     "css-watch": "postcss -u postcss-import -u postcss-url -u postcss-cssnext -d static app/app.css -w",
-    "watch": "npm run templates & npm run js-watch & npm run css-watch & nodemon -e js,html --ignore ./compiled/ -r dotenv/config server.js",
+    "watch": "npm run templates-watch & npm run js-watch & npm run css-watch & nodemon -e js,html --ignore ./compiled/ -r dotenv/config server.js",
     "build": "npm run templates && npm run js && npm run css",
     "test": "standard",
     "serve": "node -r dotenv/config server.js"
@@ -21,11 +22,13 @@
     "basscss-btn": "^1.1.1",
     "basscss-btn-primary": "^1.1.0",
     "browserify": "^13.0.0",
+    "colors.css": "^3.0.0",
     "cssnano": "^3.5.2",
     "hyperx": "^2.0.2",
     "main-loop": "^3.2.0",
     "node-pg-migrate": "0.0.9",
     "nodemon": "^1.8.1",
+    "page": "^1.6.4",
     "postcss-cli": "^2.5.1",
     "postcss-cssnext": "^2.4.0",
     "postcss-import": "^8.0.2",
@@ -36,13 +39,14 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "atlatl": "^5.1.0",
+    "atlatl": "^5.2.0",
     "body-parser": "^1.14.2",
     "compression": "^1.6.1",
     "dotenv": "^2.0.0",
     "express": "^4.13.3",
     "morgan": "^1.6.1",
-    "pg": "^4.4.3"
+    "pg": "^4.4.3",
+    "whatwg-fetch": "^0.11.0"
   },
   "standard": {
     "ignore": [

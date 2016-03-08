@@ -56,11 +56,11 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.post('/api/task', function (req, res, next) {
-    assert.ok(req.body.title, 'Title is required')
-    assert.ok(req.body.content, 'Description is required')
-    assert.ok(req.body.closed, 'Closed is required')
+    assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
+    assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
+    assert.ok(typeof req.body.closed !== 'undefined', 'Closed is required')
     assert.string(req.body.title, 'Title must be a string')
-    assert.string(req.body.content, 'Description must be a string')
+    assert.string(req.body.content, 'Content must be a string')
     assert.bool(req.body.closed, 'Closed must be a bool')
 
     client.query({
@@ -79,11 +79,11 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.put('/api/task/:id', function (req, res, next) {
-    assert.ok(req.body.title, 'Title is required')
-    assert.ok(req.body.content, 'Description is required')
-    assert.ok(req.body.closed, 'Closed is required')
+    assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
+    assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
+    assert.ok(typeof req.body.closed !== 'undefined', 'Closed is required')
     assert.string(req.body.title, 'Title must be a string')
-    assert.string(req.body.content, 'Description must be a string')
+    assert.string(req.body.content, 'Content must be a string')
     assert.bool(req.body.closed, 'Closed must be a bool')
 
     client.query({
