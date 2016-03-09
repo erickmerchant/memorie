@@ -7,3 +7,8 @@
 body {
   font-family: 'Montserrat';
 }
+
+.field {
+  font-family: inherit;
+  font-size: inherit;
+}

@@ -3,11 +3,10 @@ var main = require('main-loop')
 var api = require('./api.js')
 var runtime = require('./runtime.js')
 var ListTemplate = require('./list.html.js')(runtime)
-var CreateTemplate = require('./create.html.js')(runtime)
-var UpdateTemplate = require('./update.html.js')(runtime)
+var ItemTemplate = require('./item.html.js')(runtime)
 var app = {}
 var loop = main(state, render, {
-  document: document,
+  document,
   create: require('virtual-dom/create-element'),
   diff: require('virtual-dom/diff'),
   patch: require('virtual-dom/patch')
@@ -16,11 +15,15 @@ var state, template
 
 document.querySelector('main').appendChild(loop.target)
 
+page('/', function () {
+  page('/task')
+})
+
 page(
   '/task',
   function (ctx, next) {
     api('/api/task').then(function (tasks) {
-      state = {tasks: tasks}
+      state = {tasks}
 
       next()
     })
@@ -35,10 +38,14 @@ page(
 page(
   '/task/new',
   function (ctx, next) {
-    next()
+    api('/api/task').then(function (tasks) {
+      state = {tasks}
+
+      next()
+    })
   },
   function (ctx) {
-    template = new CreateTemplate()
+    template = new ItemTemplate()
 
     loop.update(state)
   }
@@ -47,14 +54,17 @@ page(
 page(
   '/task/:id',
   function (ctx, next) {
-    api('/api/task/' + ctx.params.id).then(function (task) {
-      state = {task: task}
+    Promise.all([
+      api('/api/task/' + ctx.params.id),
+      api('/api/task')
+    ]).then(function ([task, tasks]) {
+      state = {task, tasks}
 
       next()
     })
   },
   function (ctx) {
-    template = new UpdateTemplate()
+    template = new ItemTemplate()
 
     loop.update(state)
   }
