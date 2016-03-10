@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "templates": "atlatl app/**/*.html --cache-directory app --variable 'state, app'",
-    "templates-watch": "atlatl --watch -- app/**/*.html --cache-directory app --variable 'state, app'",
+    "templates": "atlatl app/**/*.html --cache-directory app --variable 'state, actions'",
+    "templates-watch": "atlatl --watch -- app/**/*.html --cache-directory app --variable 'state, actions'",
     "js": "browserify -t [ babelify --presets [ es2015 ] ] app/app.js > static/app.js && uglifyjs static/app.js --compress --mangle --output static/app.js",
     "js-watch": "watchify -t [ babelify --presets [ es2015 ] ] -o static/app.js app/app.js",
     "css": "postcss -u postcss-import -u postcss-url -u postcss-cssnext -u cssnano -d static app/app.css",
