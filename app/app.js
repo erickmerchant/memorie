@@ -1,38 +1,38 @@
-var app = require('./framework')
-var api = require('./api')
+var fetch = require('./fetch')
 var templates = require('./templates')
+var framework = require('./framework')
 
-app.redirect('/', '/task')
+framework.redirect('/', '/task')
 
-app.route('/task', function (ctx) {
-  return api('/api/task').then(function (tasks) {
+framework.route('/task', function (ctx) {
+  return fetch('/api/task')
+  .then(function (tasks) {
     ctx.state = {tasks}
 
     ctx.template = templates.list
   })
 })
 
-app.action('test', function () {
+framework.action('test', function () {
   console.log('clicked')
 })
 
-app.route('/task/new', function (ctx) {
-  return api('/api/task').then(function (tasks) {
+framework.route('/task/new', function (ctx) {
+  return fetch('/api/task')
+  .then(function (tasks) {
     ctx.state = {tasks}
 
     ctx.template = templates.item
   })
 })
 
-app.route('/task/:id', function (ctx) {
-  return Promise.all([
-    api('/api/task/' + ctx.params.id),
-    api('/api/task')
-  ]).then(function ([task, tasks]) {
+framework.route('/task/:id', function (ctx) {
+  return Promise.all([fetch('/api/task/' + ctx.params.id), fetch('/api/task')])
+  .then(function ([task, tasks]) {
     ctx.state = {task, tasks}
 
     ctx.template = templates.item
   })
 })
 
-app.run('main')
+framework.run('main')
