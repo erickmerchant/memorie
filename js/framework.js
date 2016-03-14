@@ -1,7 +1,15 @@
 var main = require('main-loop')
 var page = require('page')
 var actions = {}
-var loop = main({}, render, {
+var loop = main({}, function (ctx) {
+  current = ctx
+
+  if (!ctx.template) {
+    return require('virtual-dom/h')('div')
+  }
+
+  return ctx.template.render(ctx.state, actions)
+}, {
   document,
   create: require('virtual-dom/create-element'),
   diff: require('virtual-dom/diff'),
@@ -10,15 +18,11 @@ var loop = main({}, render, {
 var current
 
 function redirect (from, to) {
-  page.redirect(from, to)
-}
-
-function goto (to) {
-  page.redirect(to)
-}
-
-function back () {
-  window.history.back()
+  if (to) {
+    page.redirect(from, to)
+  } else {
+    page.redirect(from)
+  }
 }
 
 function route (from, callback) {
@@ -49,26 +53,14 @@ function run (target) {
   page()
 }
 
-function render (ctx) {
-  current = ctx
-
-  if (!ctx.template) {
-    return require('virtual-dom/h')('div')
-  }
-
-  return ctx.template.render(ctx.state, actions)
-}
-
-function update (state) {
+function merge (state) {
   loop.update(Object.assign(current, {state: Object.assign(current.state, state)}))
 }
 
 module.exports = {
   redirect,
-  back,
-  goto,
   route,
   action,
   run,
-  update
+  merge
 }

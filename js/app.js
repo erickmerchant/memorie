@@ -12,7 +12,7 @@ framework.route('/tasks', function (ctx) {
     ctx.template = templates.list
   })
   .catch(function (e) {
-    framework.update({error: e})
+    framework.merge({error: e})
   })
 })
 
@@ -24,7 +24,7 @@ framework.route('/tasks/new', function (ctx) {
     ctx.template = templates.item
   })
   .catch(function (e) {
-    framework.update({error: e})
+    framework.merge({error: e})
   })
 })
 
@@ -36,7 +36,7 @@ framework.route('/tasks/:id', function (ctx) {
     ctx.template = templates.item
   })
   .catch(function (e) {
-    framework.update({error: e})
+    framework.merge({error: e})
   })
 })
 
@@ -52,10 +52,10 @@ framework.action('create', function (e, ctx) {
     })
   })
   .then(function () {
-    framework.back()
+    framework.redirect('/tasks')
   })
   .catch(function (e) {
-    framework.update({error: e})
+    framework.merge({error: e})
   })
 })
 
@@ -71,29 +71,10 @@ framework.action('save', function (e, ctx) {
     })
   })
   .then(function () {
-    framework.back()
+    framework.redirect('/tasks')
   })
   .catch(function (e) {
-    framework.update({error: e})
-  })
-})
-
-framework.action('toggle', function (e, ctx) {
-  e.preventDefault()
-
-  fetch('/api/tasks/' + ctx.id, {
-    method: 'put',
-    body: JSON.stringify({
-      title: ctx.title,
-      content: ctx.content,
-      closed: this.checked
-    })
-  })
-  .then(function () {
-    framework.back()
-  })
-  .catch(function (e) {
-    framework.update({error: e})
+    framework.merge({error: e})
   })
 })
 
@@ -104,10 +85,10 @@ framework.action('delete', function (e, ctx) {
     method: 'delete'
   })
   .then(function () {
-    framework.back()
+    framework.redirect('/tasks')
   })
   .catch(function (e) {
-    framework.update({error: e})
+    framework.merge({error: e})
   })
 })
 
