@@ -45,8 +45,8 @@ pg.connect(databaseURL, function (err, client) {
     next()
   })
 
-  app.get('/api/task', function (req, res, next) {
-    client.query('SELECT * FROM task WHERE closed = false ORDER BY id ASC', function (err, result) {
+  app.get('/api/tasks', function (req, res, next) {
+    client.query('SELECT * FROM task ORDER BY id ASC', function (err, result) {
       if (err) {
         next(err)
       } else {
@@ -55,7 +55,7 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.post('/api/task', function (req, res, next) {
+  app.post('/api/tasks', function (req, res, next) {
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
     assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
     assert.ok(typeof req.body.closed !== 'undefined', 'Closed is required')
@@ -78,7 +78,7 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.put('/api/task/:id', function (req, res, next) {
+  app.put('/api/tasks/:id', function (req, res, next) {
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
     assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
     assert.ok(typeof req.body.closed !== 'undefined', 'Closed is required')
@@ -101,7 +101,7 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.delete('/api/task/:id', function (req, res, next) {
+  app.delete('/api/tasks/:id', function (req, res, next) {
     client.query({
       name: 'delete-task',
       text: 'DELETE FROM task WHERE id = $1',
@@ -117,7 +117,7 @@ pg.connect(databaseURL, function (err, client) {
     })
   })
 
-  app.get('/api/task/:id', function (req, res, next) {
+  app.get('/api/tasks/:id', function (req, res, next) {
     client.query('SELECT * FROM task WHERE id = $1', [req.params.id], function (err, result) {
       if (err) {
         next(err)

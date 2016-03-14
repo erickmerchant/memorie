@@ -1,0 +1,29 @@
+<div class="relative">
+  <div class="clearfix">
+    @if (state.error)
+      <div class="mt2 mb0 col col-12">
+        <div class="p2 bg-purple white">${state.error.message}</div>
+      </div>
+    @
+    <div class="col col-12 ${state.task ? ' hide' : ''}">
+      <h1>Tasks</h1>
+      <ul class="fuchsia">
+        @each state.tasks (item)
+          <li>
+            <input class="field" type="checkbox" name="closed" onchange=${actions.toggle(item)} checked="${item.closed ? 'checked' : ''}">
+            @if (item.closed)
+              <del><a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a></del>
+            @
+            @if (!item.closed)
+              <a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a>
+            @
+          </li>
+        @
+        <li><a class="fuchsia" href="/tasks/new">Add New</a></li>
+      </ul>
+    </div>
+    <div class="col col-12">
+      @yield form
+    </div>
+  </div>
+</div>

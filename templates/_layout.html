@@ -8,14 +8,14 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    <div class="clearfix white bg-maroon p2 bold">
+    <main class="mt3 max-width-4 mx-auto p2">
+      @yield main
+    </main>
+    <div class="fixed top-0 right-0 left-0 white bg-maroon p2 bold">
       <div class="left">
         <span>Memorie</span>
       </div>
     </div>
-    <main class="max-width-4 mx-auto p2">
-      @yield main
-    </main>
     @yield js
   </body>
 </html>
