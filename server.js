@@ -10,7 +10,7 @@ const bodyParser = require('body-parser')
 const assert = require('assert-plus')
 const morgan = require('morgan')
 const pg = require('pg')
-const atlatl = require('atlatl')({cacheDirectory: './compiled/'})
+const atlatl = require('atlatl')({cacheDirectory: './templates/'})
 const app = express()
 
 pg.connect(databaseURL, function (err, client) {

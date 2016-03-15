@@ -1,21 +1,21 @@
 var main = require('main-loop')
 var page = require('page')
 var actions = {}
+var current = {}
 var loop = main({}, function (ctx) {
-  current = ctx
+  current = Object.assign(current, ctx)
 
-  if (!ctx.template) {
+  if (!current.template) {
     return require('virtual-dom/h')('div')
   }
 
-  return ctx.template.render(ctx.state, actions)
+  return current.template.render(current.state, actions)
 }, {
   document,
   create: require('virtual-dom/create-element'),
   diff: require('virtual-dom/diff'),
   patch: require('virtual-dom/patch')
 })
-var current
 
 function redirect (from, to) {
   if (to) {
@@ -26,11 +26,7 @@ function redirect (from, to) {
 }
 
 function route (from, callback) {
-  page(from, (ctx, next) => {
-    callback(ctx).then(function () {
-      next()
-    })
-  }, (ctx) => {
+  page(from, callback, (ctx) => {
     loop.update(ctx)
   })
 }
@@ -43,6 +39,10 @@ function action (key, callback) {
   }
 }
 
+function extend (state) {
+  loop.update({state: Object.assign(current.state, state)})
+}
+
 function run (target) {
   if (target) {
     document.querySelector(target).appendChild(loop.target)
@@ -53,14 +53,10 @@ function run (target) {
   page()
 }
 
-function merge (state) {
-  loop.update(Object.assign(current, {state: Object.assign(current.state, state)}))
-}
-
 module.exports = {
   redirect,
   route,
   action,
-  run,
-  merge
+  extend,
+  run
 }

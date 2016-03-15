@@ -1,8 +1,8 @@
 var runtime = require('./runtime')
 var ListTemplate = require('./templates/list.html.js')(runtime)
-var ItemTemplate = require('./templates/item.html.js')(runtime)
+var FormTemplate = require('./templates/form.html.js')(runtime)
 
 module.exports = {
   list: new ListTemplate(),
-  item: new ItemTemplate()
+  form: new FormTemplate()
 }

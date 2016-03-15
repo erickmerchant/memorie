@@ -1,0 +1,29 @@
+@extends _layout.html
+
+@section main
+  <div>
+    <div class="clearfix">
+      @call list
+    </div>
+    <form class="fixed top-0 right-0 bottom-0 left-0 bg-white p2 mt3" onsubmit=${state.task ? actions.save(state.task) : actions.create()}>
+      @call errors
+      <h1>${state.task ? state.task.title : 'New Task'}</h1>
+      <label class="block my2">
+        Title
+        <input class="col-12 sm-col-12 p1 input" type="text" placeholder="" name="title" value="${state.task ? state.task.title : ''}">
+      </label>
+      <label class="block my2">
+        Content
+        <textarea class="col-12 sm-col-12 p1 textarea" type="text" placeholder="" name="content">${state.task ? state.task.content : ''}</textarea>
+      </label>
+      <label class="block my2">
+        Closed
+        <input class="field" type="checkbox" name="closed" checked="${state.task && state.task.closed ? 'checked' : ''}">
+      </label>
+      <div class="inline-block mr1 mb1"><button class="btn btn-primary btn-big bg-fuchsia" type="submit">Save</button></div>
+      @if (state.task)
+        <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-purple" type="button" onclick=${actions.delete(state.task)}>Delete</button></div>
+      @
+    </form>
+  </div>
+@
