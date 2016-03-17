@@ -1,62 +1,50 @@
-var main = require('main-loop')
-var page = require('page')
-var actions = {}
-var current = {}
-var loop = main({}, function (ctx) {
-  current = Object.assign(current, ctx)
-
-  if (!current.template) {
-    return require('virtual-dom/h')('div')
-  }
-
-  return current.template.render(current.state, actions)
+var vdom = require('virtual-dom')
+var hyperx = require('hyperx')
+var mainLoop = require('main-loop')
+var singlePage = require('single-page')
+var trieRoute = require('trie-route')
+var catchLinks = require('catch-links')
+var hx = hyperx(vdom.h)
+var initialState
+var loop = mainLoop(initialState, function (state) {
+  return hx`<a href="/click-here">Click Here</a>`
 }, {
   document,
   create: require('virtual-dom/create-element'),
   diff: require('virtual-dom/diff'),
   patch: require('virtual-dom/patch')
 })
+var router = trieRoute.create()
 
-function redirect (from, to) {
-  if (to) {
-    page.redirect(from, to)
-  } else {
-    page.redirect(from)
-  }
-}
+module.exports = function (selector) {
+  var current
+  var page = singlePage(function (href) {
+    current = href
 
-function route (from, callback) {
-  page(from, callback, (ctx) => {
-    loop.update(ctx)
+    var error = router.process(href)
+    console.log('error:', error)
   })
-}
 
-function action (key, callback) {
-  actions[key] = function (ctx) {
-    return function (e) {
-      return callback.call(this, e, ctx)
+  document.querySelector(selector).appendChild(loop.target)
+
+  catchLinks(window, function (href) {
+    console.log('dsfsdf')
+
+    page(href)
+  })
+
+  return {
+    route: router.path,
+    redirect: function (from, to) {
+      setTimeout(function () {
+        router.path(from, function () {
+          page.push(to)
+        })
+
+        console.log(current)
+
+        router.process(current)
+      }, 0)
     }
   }
-}
-
-function extend (state) {
-  loop.update({state: Object.assign(current.state, state)})
-}
-
-function run (target) {
-  if (target) {
-    document.querySelector(target).appendChild(loop.target)
-  }
-
-  page.base('')
-
-  page()
-}
-
-module.exports = {
-  redirect,
-  route,
-  action,
-  extend,
-  run
 }
