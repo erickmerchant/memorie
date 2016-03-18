@@ -39,7 +39,8 @@
     "standard": "^6.0.4",
     "trie-route": "0.0.3",
     "virtual-dom": "^2.1.1",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "whatwg-fetch": "^0.11.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
