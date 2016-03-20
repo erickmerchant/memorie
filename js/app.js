@@ -22,7 +22,7 @@ route('/tasks/new', function (params, app) {
   .then(function (tasks) {
     app.render(view({mode: 'create', tasks}, app))
 
-    setTimeout(() => document.querySelector('form').scrollIntoView(), 10)
+    setTimeout(() => document.querySelector('form').scrollIntoView({behavior: 'smooth', block: 'start'}), 10)
   })
   .catch(function (error) {
     app.render(view({error}, app))
@@ -34,7 +34,7 @@ route('/tasks/:id', function (params, app) {
   .then(function ([task, tasks]) {
     app.render(view({mode: 'edit', task, tasks}, app))
 
-    setTimeout(() => document.querySelector('form').scrollIntoView(), 10)
+    setTimeout(() => document.querySelector('form').scrollIntoView({behavior: 'smooth', block: 'start'}), 10)
   })
   .catch(function (error) {
     app.render(view({error}, app))
@@ -70,7 +70,7 @@ function view (state, app) {
 }
 
 function viewItem (task, app) {
-  return tag`<form class="bg-silver py3" onsubmit=${task ? saveItem(task.id, app) : createItem(app)}>
+  return tag`<form class="bg-silver py3 px1" onsubmit=${task ? saveItem(task.id, app) : createItem(app)}>
     <div class="black pb2 max-width-4 mx-auto">
       <label class="block my2">
         Title
