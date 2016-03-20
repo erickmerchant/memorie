@@ -10,83 +10,78 @@ redirect('/', '/tasks')
 route('/tasks', function (params, app) {
   fetch('/api/tasks')
   .then(function (tasks) {
-    app.render(viewList({tasks}))
+    app.render(view({mode: 'list', tasks}))
   })
   .catch(function (error) {
-    app.render(viewList({error}))
+    app.render(view({error}))
   })
 })
 
 route('/tasks/new', function (params, app) {
   fetch('/api/tasks')
   .then(function (tasks) {
-    app.render(viewList({tasks}, viewItem({tasks}, app)))
+    app.render(view({mode: 'create', tasks}, app))
   })
   .catch(function (error) {
-    app.render(viewList({}, viewItem({error}, app)))
+    app.render(view({error}, app))
   })
 })
 
 route('/tasks/:id', function (params, app) {
   fetch(['/api/tasks/' + params.id, '/api/tasks'])
   .then(function ([task, tasks]) {
-    app.render(viewList({tasks}, viewItem({task, tasks}, app)))
+    app.render(view({mode: 'edit', task, tasks}, app))
   })
   .catch(function (error) {
-    app.render(viewList({}, viewItem({error}, app)))
+    app.render(view({error}, app))
   })
 })
 
 run('main')
 
-function viewList (state, content) {
-  return tag`<div>
-    <div class="clearfix">
-      ${viewError(state)}
-      <div class="col col-12">
-        <h1>Tasks</h1>
-        <ul class="fuchsia list-reset">
-          ${(state.tasks || []).map((item) => {
-            return tag`<li class="p1">
-              ${item.closed ? tag`<del><a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a></del>` : tag`<a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a>`}
-            </li>`
-          })}
-        </ul>
-        <a class="btn btn-primary btn-big bg-fuchsia" href="/tasks/new">Add New</a>
+function view (state, app) {
+  return tag`<div class="mt4 p2">
+    ${state.error ? tag`<div class="mt2 mb0 col col-12">
+      <div class="p2 bg-purple white">${state.error.message}</div>
+    </div>` : ''}
+    ${state.mode === 'create' ? viewItem(undefined, app) : ''}
+    ${(state.tasks || []).map((item) => {
+      if (state.task && item.id === state.task.id) {
+        return viewItem(state.task, app)
+      }
+
+      return tag`<div class="max-width-4 mx-auto">
+        ${item.closed ? tag`<del><a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a></del>` : tag`<a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a>`}
+      </div>`
+    })}
+    <div class="fixed top-0 right-0 left-0 white bg-maroon p2 bold">
+      <div class="left">
+        <span class="btn">Memorie</span>
+      </div>
+      <div class="right">
+        <a class="btn border--white white rounded" href="/tasks/new">+ Add</a>
       </div>
     </div>
-    ${content ? content : ''}
   </div>`
 }
 
-function viewItem (state, app) {
-  return tag`<form class="fixed top-0 right-0 bottom-0 left-0 bg-white p2 mt3" onsubmit=${state.task ? saveItem(state.task.id, app) : createItem(app)}>
-    ${viewError(state)}
-    <h1>${state.task ? state.task.title || 'untitled' : 'New Task'}</h1>
+function viewItem (task, app) {
+  return tag`<form class="black pb2 max-width-4 mx-auto" onsubmit=${task ? saveItem(task.id, app) : createItem(app)}>
     <label class="block my2">
       Title
-      <input class="col-12 sm-col-12 p1 input" type="text" placeholder="" name="title" value="${state.task ? state.task.title : ''}">
+      <input class="p1 input" type="text" placeholder="" name="title" value="${task ? task.title : ''}">
     </label>
     <label class="block my2">
       Content
-      <textarea class="col-12 sm-col-12 p1 textarea" type="text" placeholder="" name="content">${state.task ? state.task.content : ''}</textarea>
+      <textarea class="p1 textarea" type="text" placeholder="" name="content">${task ? task.content : ''}</textarea>
     </label>
     <label class="block my2">
       Closed
-      <input class="field" type="checkbox" name="closed" checked="${state.task && state.task.closed ? 'checked' : ''}">
+      <input class="field" type="checkbox" name="closed" checked="${task && task.closed ? 'checked' : ''}">
     </label>
     <div class="inline-block mr1 mb1"><button class="btn btn-primary btn-big bg-fuchsia" type="submit">Save</button></div>
-    ${state.task ? tag`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-purple" type="button" onclick=${deleteItem(state.task.id, app)}>Delete</button></div>` : ''}
+    ${task ? tag`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-purple" type="button" onclick=${deleteItem(task.id, app)}>Delete</button></div>` : ''}
   </form>`
-}
-
-function viewError (state) {
-  if (!state.error) return ''
-
-  return tag`
-  <div class="mt2 mb0 col col-12">
-    <div class="p2 bg-purple white">${state.error.message}</div>
-  </div>`
 }
 
 function createItem (app) {
