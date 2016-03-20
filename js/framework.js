@@ -3,8 +3,8 @@ var VText = require('virtual-dom/vnode/vtext')
 var hyperx = require('hyperx')
 var mainLoop = require('main-loop')
 var singlePage = require('single-page')
-var trieRoute = require('trie-route')
 var catchLinks = require('catch-links')
+var pathMatch = require('path-match')()
 var tag = hyperx(vdom.h)
 var loopOptions = {
   document,
@@ -19,7 +19,7 @@ var loop = mainLoop(null, function (dom) {
 
   return dom
 }, loopOptions)
-var router = trieRoute.create()
+var routes = []
 var current
 var page
 
@@ -31,40 +31,58 @@ module.exports = {
 }
 
 function route (from, callback) {
-  router.path(from, function (params) {
-    var id = Symbol()
+  routes.push({
+    match: pathMatch(from),
+    callback: function (params) {
+      var id = Symbol()
 
-    current = id
+      current = id
 
-    callback(params, {
-      render: function (dom) {
-        if (id === current) {
-          loop.update(dom)
+      callback(params, {
+        render: function (dom) {
+          if (id === current) {
+            loop.update(dom)
+          }
+        },
+        redirect: function (to) {
+          if (id === current) {
+            setTimeout(function () {
+              page(to)
+            }, 0)
+          }
         }
-      },
-      redirect: function (to) {
-        setTimeout(function () {
-          page(to)
-        }, 0)
-      }
-    })
+      })
+    }
   })
 }
 
 function redirect (from, to) {
-  router.path(from, function () {
-    setTimeout(function () {
-      page(to)
-    }, 0)
+  routes.push({
+    match: pathMatch(from),
+    callback: function () {
+      setTimeout(function () {
+        page(to)
+      }, 0)
+    }
   })
 }
 
 function run (selector) {
   page = singlePage(function (href) {
-    var error = router.process(href)
+    var params
 
-    if (error) {
-      console.error(error)
+    console.log(routes)
+
+    for (let i = 0; i < routes.length; i++) {
+      params = routes[i].match(href)
+
+      console.log(params)
+
+      if (params !== false) {
+        routes[i].callback(params)
+
+        break
+      }
     }
   })
 
