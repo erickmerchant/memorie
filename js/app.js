@@ -1,149 +1,126 @@
-var fetch = require('./fetch')
-var framework = require('./framework')
-var tag = framework.tag
-var redirect = framework.redirect
-var route = framework.route
-var run = framework.run
+var fetch = require('simple-fetch')
+var scrollIntoView = require('scroll-into-view')
+var vdom = require('virtual-dom')
+var hyperx = require('hyperx')
+var mainLoop = require('main-loop')
+var hx = hyperx(vdom.h)
+var loopOptions = {
+  create: require('virtual-dom/create-element'),
+  diff: require('virtual-dom/diff'),
+  patch: require('virtual-dom/patch')
+}
 
-redirect('/', '/tasks')
+fetch.getJson('/api/tasks').then(function (tasks) {
+  var state = {tasks, mode: 'list'}
+  var loop = mainLoop(state, function (state) {
+    process.nextTick(function () {
+      var form = document.querySelector('form')
 
-route('/tasks', function (params, app) {
-  fetch('/api/tasks')
-  .then(function (tasks) {
-    app.render(view({mode: 'list', tasks}))
-  })
-  .catch(function (error) {
-    app.render(view({error}))
-  })
-})
-
-route('/tasks/new', function (params, app) {
-  fetch('/api/tasks')
-  .then(function (tasks) {
-    app.render(view({mode: 'create', tasks}, app))
-
-    setTimeout(() => document.querySelector('form').scrollIntoView({behavior: 'smooth', block: 'start'}), 10)
-  })
-  .catch(function (error) {
-    app.render(view({error}, app))
-  })
-})
-
-route('/tasks/:id', function (params, app) {
-  fetch(['/api/tasks/' + params.id, '/api/tasks'])
-  .then(function ([task, tasks]) {
-    app.render(view({mode: 'edit', task, tasks}, app))
-
-    setTimeout(() => document.querySelector('form').scrollIntoView({behavior: 'smooth', block: 'start'}), 10)
-  })
-  .catch(function (error) {
-    app.render(view({error}, app))
-  })
-})
-
-run('main')
-
-function view (state, app) {
-  return tag`<div>
-    <div class="clearfix white bg-maroon p2 bold">
-      <div class="left">
-        <span class="btn">Memorie</span>
-      </div>
-      <div class="right">
-        <a class="btn border--white white rounded" href="/tasks/new">+ Add</a>
-      </div>
-    </div>
-    ${state.error ? tag`<div class="mt2 mb0 col col-12">
-      <div class="p2 bg-purple white">${state.error.message}</div>
-    </div>` : ''}
-    ${state.mode === 'create' ? viewItem(undefined, app) : ''}
-    ${(state.tasks || []).map((item) => {
-      if (state.task && item.id === state.task.id) {
-        return viewItem(state.task, app)
+      if (form) {
+        scrollIntoView(form)
       }
+    })
 
-      return tag`<div class="max-width-4 mx-auto p1">
-        ${item.closed ? tag`<del><a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a></del>` : tag`<a class="fuchsia" href="/tasks/${item.id}">${item.title || 'untitled'}</a>`}
-      </div>`
-    })}
-  </div>`
-}
+    return hx`<div>
+      <div class="clearfix white bg-maroon p2 bold center h3">Memorie</div>
+      ${state.error ? hx`<div class="block p2 bg-purple white">${state.error.message}</div>` : ''}
+      ${(state.tasks || []).map((item) => {
+        if (state.mode === 'edit' && item.id === state.task.id) {
+          return viewItem(state.task)
+        }
 
-function viewItem (task, app) {
-  return tag`<form class="bg-silver py3 px1" onsubmit=${task ? saveItem(task.id, app) : createItem(app)}>
-    <div class="black pb2 max-width-4 mx-auto">
-      <label class="block my2">
-        Title
-        <input class="p1 input" type="text" placeholder="" name="title" value="${task ? task.title : ''}">
-      </label>
-      <label class="block my2">
-        Content
-        <textarea class="p1 textarea" type="text" placeholder="" name="content">${task ? task.content : ''}</textarea>
-      </label>
-      <label class="block my2">
-        Closed
-        <input class="field" type="checkbox" name="closed" checked="${task && task.closed ? 'checked' : ''}">
-      </label>
-      <div class="inline-block mr1 mb1"><button class="btn btn-primary btn-big bg-fuchsia" type="submit">Save</button></div>
-      ${task ? tag`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-purple" type="button" onclick=${deleteItem(task.id, app)}>Delete</button></div>` : ''}
-    </div>
-  </form>`
-}
+        return hx`<div class="col col-12 p1">
+          <div class="max-width-2 mx-auto center">
+            <a href="#" class="fuchsia" onclick=${setEditMode(item.id)}>${item.title || 'untitled'}</a>
+          </div>
+        </div>`
+      })}
+      ${state.mode === 'create' ? viewItem(undefined) : hx`<div class="col col-12 p1">
+        <div class="max-width-2 mx-auto center">
+          <a href="#" class="fuchsia" onclick=${setCreateMode}>+ Add</a>
+        </div>
+      </div>`}
+    </div>`
 
-function createItem (app) {
-  return function (e) {
+    function viewItem (task) {
+      return hx`<form class="col col-12 bg-silver py3 px1" onsubmit=${task ? saveItem(task.id) : createItem}>
+        <div class="black pb2 max-width-2 mx-auto">
+          <label class="block my2">
+            Title
+            <input class="p1 input" type="text" placeholder="" name="title" value="${task ? task.title : ''}">
+          </label>
+          <label class="block my2">
+            Content
+            <textarea class="p1 textarea" type="text" placeholder="" name="content">${task ? task.content : ''}</textarea>
+          </label>
+          <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="submit">Save</button></div>
+          ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-purple" type="button" onclick=${deleteItem(task.id)}>Delete</button></div>` : ''}
+        </div>
+      </form>`
+    }
+  }, loopOptions)
+
+  document.querySelector('main').appendChild(loop.target)
+
+  function setCreateMode (e) {
     e.preventDefault()
 
-    fetch('/api/tasks', {
-      method: 'post',
-      body: JSON.stringify({
-        title: this.title.value,
-        content: this.content.value,
-        closed: this.closed.checked
+    state.mode = 'create'
+
+    loop.update(state)
+  }
+
+  function setEditMode (id) {
+    return function (e) {
+      e.preventDefault()
+
+      state.mode = 'edit'
+
+      fetch.getJson('/api/tasks/' + id).then(function (task) {
+        state.task = task
+
+        loop.update(state)
       })
-    })
-    .then(function () {
-      app.redirect('/tasks')
-    })
-    .catch(function (error) {
-      app.render(view({error}, app))
-    })
+    }
   }
-}
 
-function saveItem (id, app) {
-  return function (e) {
+  function createItem (e) {
     e.preventDefault()
 
-    fetch('/api/tasks/' + id, {
-      method: 'put',
-      body: JSON.stringify({
+    fetch.postJson('/api/tasks', {
+      title: this.title.value,
+      content: this.content.value
+    })
+    .then(refreshList)
+  }
+
+  function saveItem (id) {
+    return function (e) {
+      e.preventDefault()
+
+      fetch.putJson('/api/tasks/' + id, {
         title: this.title.value,
-        content: this.content.value,
-        closed: this.closed.checked
+        content: this.content.value
       })
-    })
-    .then(function () {
-      app.redirect('/tasks')
-    })
-    .catch(function (error) {
-      app.render(view({error}, app))
+      .then(refreshList)
+    }
+  }
+
+  function deleteItem (id) {
+    return function (e) {
+      e.preventDefault()
+
+      fetch.deleteJson('/api/tasks/' + id)
+      .then(refreshList)
+    }
+  }
+
+  function refreshList () {
+    fetch.getJson('/api/tasks').then(function (tasks) {
+      state.tasks = tasks
+      state.mode = 'list'
+
+      loop.update(state)
     })
   }
-}
-
-function deleteItem (id, app) {
-  return function (e) {
-    e.preventDefault()
-
-    fetch('/api/tasks/' + id, {
-      method: 'delete'
-    })
-    .then(function () {
-      app.redirect('/tasks')
-    })
-    .catch(function (error) {
-      app.render(view({error}, app))
-    })
-  }
-}
+})

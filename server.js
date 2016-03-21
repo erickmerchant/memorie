@@ -58,15 +58,13 @@ pg.connect(databaseURL, function (err, client) {
   app.post('/api/tasks', function (req, res, next) {
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
     assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
-    assert.ok(typeof req.body.closed !== 'undefined', 'Closed is required')
     assert.string(req.body.title, 'Title must be a string')
     assert.string(req.body.content, 'Content must be a string')
-    assert.bool(req.body.closed, 'Closed must be a bool')
 
     client.query({
       name: 'insert-task',
-      text: 'INSERT INTO task (title, content, closed) VALUES ($1, $2, $3) RETURNING id',
-      values: [req.body.title, req.body.content, req.body.closed]
+      text: 'INSERT INTO task (title, content) VALUES ($1, $2) RETURNING id',
+      values: [req.body.title, req.body.content]
     }, function (err, result) {
       if (err) {
         next(err)
@@ -81,22 +79,20 @@ pg.connect(databaseURL, function (err, client) {
   app.put('/api/tasks/:id', function (req, res, next) {
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
     assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
-    assert.ok(typeof req.body.closed !== 'undefined', 'Closed is required')
     assert.string(req.body.title, 'Title must be a string')
     assert.string(req.body.content, 'Content must be a string')
-    assert.bool(req.body.closed, 'Closed must be a bool')
 
     client.query({
       name: 'update-task',
-      text: 'UPDATE task SET title = $2, content = $3, closed = $4 WHERE id = $1',
-      values: [req.params.id, req.body.title, req.body.content, req.body.closed]
+      text: 'UPDATE task SET title = $2, content = $3 WHERE id = $1',
+      values: [req.params.id, req.body.title, req.body.content]
     }, function (err, result) {
       if (err) {
         next(err)
       } else {
         res.status(200)
 
-        res.send('')
+        res.send({id: req.params.id})
       }
     })
   })
@@ -112,7 +108,7 @@ pg.connect(databaseURL, function (err, client) {
       } else {
         res.status(200)
 
-        res.send('')
+        res.send({id: req.params.id})
       }
     })
   })
