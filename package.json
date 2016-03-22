@@ -25,6 +25,7 @@
     "basscss-colors": "^2.2.0",
     "basscss-forms": "^1.0.0",
     "browserify": "^13.0.0",
+    "catch-links": "^2.0.0",
     "cssnano": "^3.5.2",
     "hyperx": "^2.0.2",
     "hyperxify": "^2.0.1",
@@ -37,9 +38,11 @@
     "postcss-url": "^5.1.1",
     "scroll-into-view": "^1.6.0",
     "simple-fetch": "^1.2.1",
+    "single-page": "^1.1.0",
     "standard": "^6.0.4",
     "virtual-dom": "^2.1.1",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "wayfarer": "^6.1.3"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",

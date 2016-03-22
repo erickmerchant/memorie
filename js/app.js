@@ -1,5 +1,8 @@
 var fetch = require('simple-fetch')
 var scrollIntoView = require('scroll-into-view')
+var catchLinks = require('catch-links')
+var singlePage = require('single-page')
+var wayfarer = require('wayfarer')
 var vdom = require('virtual-dom')
 var hyperx = require('hyperx')
 var mainLoop = require('main-loop')
@@ -31,13 +34,13 @@ fetch.getJson('/api/tasks').then(function (tasks) {
 
         return hx`<div class="col col-12 p1">
           <div class="max-width-2 mx-auto center">
-            <a href="#" class="fuchsia" onclick=${setEditMode(item.id)}>${item.title || 'untitled'}</a>
+            <a href="/edit/${item.id}" class="fuchsia">${item.title || 'untitled'}</a>
           </div>
         </div>`
       })}
       ${state.mode === 'create' ? viewItem(undefined) : hx`<div class="col col-12 p1">
         <div class="max-width-2 mx-auto center">
-          <a href="#" class="fuchsia" onclick=${setCreateMode}>+ Add</a>
+          <a href="/create" class="fuchsia">+ Add</a>
         </div>
       </div>`}
     </div>`
@@ -60,29 +63,43 @@ fetch.getJson('/api/tasks').then(function (tasks) {
     }
   }, loopOptions)
 
+  var showPage = singlePage(function (href) {
+    router(href)
+  })
+
+  var router = wayfarer()
+
+  catchLinks(window, function (href) {
+    showPage(href)
+  })
+
   document.querySelector('main').appendChild(loop.target)
 
-  function setCreateMode (e) {
-    e.preventDefault()
+  router.on('/', function () {
+    state.mode = 'list'
 
+    fetch.getJson('/api/tasks').then(function (tasks) {
+      state.tasks = tasks
+
+      loop.update(state)
+    })
+  })
+
+  router.on('/create', function () {
     state.mode = 'create'
 
     loop.update(state)
-  }
+  })
 
-  function setEditMode (id) {
-    return function (e) {
-      e.preventDefault()
+  router.on('/edit/:id', function (params) {
+    state.mode = 'edit'
 
-      state.mode = 'edit'
+    fetch.getJson('/api/tasks/' + params.id).then(function (task) {
+      state.task = task
 
-      fetch.getJson('/api/tasks/' + id).then(function (task) {
-        state.task = task
-
-        loop.update(state)
-      })
-    }
-  }
+      loop.update(state)
+    })
+  })
 
   function createItem (e) {
     e.preventDefault()
@@ -116,11 +133,6 @@ fetch.getJson('/api/tasks').then(function (tasks) {
   }
 
   function refreshList () {
-    fetch.getJson('/api/tasks').then(function (tasks) {
-      state.tasks = tasks
-      state.mode = 'list'
-
-      loop.update(state)
-    })
+    singlePage('/')
   }
 })
