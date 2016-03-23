@@ -46,7 +46,7 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.get('/api/tasks', function (req, res, next) {
-    client.query('SELECT * FROM task ORDER BY id ASC', function (err, result) {
+    client.query('SELECT * FROM task ORDER BY id DESC', function (err, result) {
       if (err) {
         next(err)
       } else {
