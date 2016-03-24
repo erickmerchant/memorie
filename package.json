@@ -42,8 +42,7 @@
     "single-page": "^1.1.0",
     "standard": "^6.0.4",
     "virtual-dom": "^2.1.1",
-    "watchify": "^3.7.0",
-    "wayfarer": "^6.1.3"
+    "watchify": "^3.7.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",

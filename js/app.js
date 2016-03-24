@@ -2,7 +2,6 @@ var fetch = require('simple-fetch')
 var scrollIntoView = require('scroll-into-view')
 var catchLinks = require('catch-links')
 var singlePage = require('single-page')
-var wayfarer = require('wayfarer')
 var vdom = require('virtual-dom')
 var hyperx = require('hyperx')
 var mainLoop = require('main-loop')
@@ -42,7 +41,7 @@ var loop = mainLoop(state, function (state) {
   </div>`
 
   function viewItem (task) {
-    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? saveItem(task.id) : createItem}>
+    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? editItem(task.id) : createItem}>
       <div class="black pb2 max-width-2 mx-auto">
         <label class="block my2">
           Title
@@ -59,11 +58,70 @@ var loop = mainLoop(state, function (state) {
   }
 }, loopOptions)
 
-var showPage = singlePage(function (href) {
-  router(href)
+var router = require('./router')(loop.update)
+
+router.add([], function (params, update) {
+  fetch.getJson('/api/tasks').then(function (tasks) {
+    update({mode: 'list', tasks})
+  })
 })
 
-var router = wayfarer('/')
+router.add(['create'], function (params, update) {
+  fetch.getJson('/api/tasks').then(function (tasks) {
+    update({mode: 'create', tasks})
+  })
+})
+
+router.add(['edit', ':id'], function (params, update) {
+  Promise.all([
+    fetch.getJson('/api/tasks'),
+    fetch.getJson('/api/tasks/' + params.id)
+  ]).then(function ([tasks, task]) {
+    update({mode: 'edit', tasks, task})
+  })
+})
+
+router.add([':event', 'create', ':data'], function (params, update) {
+  params.event.preventDefault()
+
+  fetch.postJson('/api/tasks', params.data)
+  .then(function () {
+    fetch.getJson('/api/tasks').then(function (tasks) {
+      update({mode: 'list', tasks})
+
+      showPage.push('/')
+    })
+  })
+})
+
+router.add([':event', 'edit', ':id', ':data'], function (params, update) {
+  params.event.preventDefault()
+
+  fetch.putJson('/api/tasks/' + params.id, params.data)
+  .then(function () {
+    fetch.getJson('/api/tasks').then(function (tasks) {
+      update({mode: 'list', tasks})
+
+      showPage.push('/')
+    })
+  })
+})
+
+router.add([':event', 'delete', ':id'], function (params, update) {
+  params.event.preventDefault()
+
+  fetch.deleteJson('/api/tasks/' + params.id).then(function () {
+    fetch.getJson('/api/tasks').then(function (tasks) {
+      update({mode: 'list', tasks})
+
+      showPage.push('/')
+    })
+  })
+})
+
+var showPage = singlePage(function (href) {
+  router.match(href.split('/').filter((v) => !!v))
+})
 
 catchLinks(window, function (href) {
   showPage(href)
@@ -71,70 +129,24 @@ catchLinks(window, function (href) {
 
 document.querySelector('main').appendChild(loop.target)
 
-router.on('/', function () {
-  state.mode = 'list'
-
-  fetch.getJson('/api/tasks').then(function (tasks) {
-    state.tasks = tasks
-
-    loop.update(state)
-  })
-})
-
-router.on('/create', function () {
-  state.mode = 'create'
-
-  fetch.getJson('/api/tasks').then(function (tasks) {
-    state.tasks = tasks
-
-    loop.update(state)
-  })
-})
-
-router.on('/edit/:id', function (params) {
-  state.mode = 'edit'
-
-  Promise.all([
-    fetch.getJson('/api/tasks'),
-    fetch.getJson('/api/tasks/' + params.id)
-  ]).then(function ([tasks, task]) {
-    state.tasks = tasks
-    state.task = task
-
-    loop.update(state)
-  })
-})
-
 function createItem (e) {
-  e.preventDefault()
-
-  fetch.postJson('/api/tasks', {
+  router.match([e, 'create', {
     title: this.title.value,
     content: this.content.value
-  })
-  .then(refreshList)
+  }])
 }
 
-function saveItem (id) {
+function editItem (id) {
   return function (e) {
-    e.preventDefault()
-
-    fetch.putJson('/api/tasks/' + id, {
+    router.match([e, 'edit', id, {
       title: this.title.value,
       content: this.content.value
-    })
-    .then(refreshList)
+    }])
   }
 }
 
 function deleteItem (id) {
   return function (e) {
-    e.preventDefault()
-
-    fetch.deleteJson('/api/tasks/' + id).then(refreshList)
+    router.match([e, 'delete', id])
   }
-}
-
-function refreshList () {
-  showPage('/')
 }
