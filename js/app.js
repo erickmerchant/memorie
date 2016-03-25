@@ -60,7 +60,7 @@ var loop = mainLoop(state, function (state) {
 
 var router = require('./router')(loop.update)
 
-router.add([], function (params, update) {
+router.add([''], function (params, update) {
   fetch.getJson('/api/tasks').then(function (tasks) {
     update({mode: 'list', tasks})
   })
@@ -81,9 +81,7 @@ router.add(['edit', ':id'], function (params, update) {
   })
 })
 
-router.add([':event', 'create', ':data'], function (params, update) {
-  params.event.preventDefault()
-
+router.add(['create', ':data'], function (params, update) {
   fetch.postJson('/api/tasks', params.data)
   .then(function () {
     fetch.getJson('/api/tasks').then(function (tasks) {
@@ -94,9 +92,7 @@ router.add([':event', 'create', ':data'], function (params, update) {
   })
 })
 
-router.add([':event', 'edit', ':id', ':data'], function (params, update) {
-  params.event.preventDefault()
-
+router.add(['edit', ':id', ':data'], function (params, update) {
   fetch.putJson('/api/tasks/' + params.id, params.data)
   .then(function () {
     fetch.getJson('/api/tasks').then(function (tasks) {
@@ -107,9 +103,7 @@ router.add([':event', 'edit', ':id', ':data'], function (params, update) {
   })
 })
 
-router.add([':event', 'delete', ':id'], function (params, update) {
-  params.event.preventDefault()
-
+router.add(['delete', ':id'], function (params, update) {
   fetch.deleteJson('/api/tasks/' + params.id).then(function () {
     fetch.getJson('/api/tasks').then(function (tasks) {
       update({mode: 'list', tasks})
@@ -120,7 +114,9 @@ router.add([':event', 'delete', ':id'], function (params, update) {
 })
 
 var showPage = singlePage(function (href) {
-  router.match(href.split('/').filter((v) => !!v))
+  var route = href.split('/').filter((v) => !!v)
+
+  router.match(route.length ? route : [''])
 })
 
 catchLinks(window, function (href) {
@@ -130,7 +126,9 @@ catchLinks(window, function (href) {
 document.querySelector('main').appendChild(loop.target)
 
 function createItem (e) {
-  router.match([e, 'create', {
+  e.preventDefault()
+
+  router.match(['create', {
     title: this.title.value,
     content: this.content.value
   }])
@@ -138,7 +136,9 @@ function createItem (e) {
 
 function editItem (id) {
   return function (e) {
-    router.match([e, 'edit', id, {
+    e.preventDefault()
+
+    router.match(['edit', id, {
       title: this.title.value,
       content: this.content.value
     }])
@@ -147,6 +147,8 @@ function editItem (id) {
 
 function deleteItem (id) {
   return function (e) {
-    router.match([e, 'delete', id])
+    e.preventDefault()
+
+    router.match(['delete', id])
   }
 }

@@ -9,28 +9,32 @@ module.exports = function (update) {
 
     arr.forEach(function (key, index) {
       var next
-      var val = {}
+      var param
 
       if (key.startsWith(':')) {
-        val.param = key.substr(1)
+        param = key.substr(1)
         key = '*'
       }
 
       if (current.has(key)) {
-        next = current.get(key).map
+        next = current.get(key)
       } else {
-        next = new Map()
+        next = {
+          map: new Map()
+        }
       }
 
-      val.map = next
+      if (param) {
+        next.param = param
+      }
 
       if (index + 1 === arr.length) {
-        val.callback = callback
+        next.callback = callback
       }
 
-      current.set(key, val)
+      current.set(key, next)
 
-      current = next
+      current = next.map
     })
   }
 
