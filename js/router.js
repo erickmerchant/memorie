@@ -1,4 +1,4 @@
-module.exports = function (update) {
+module.exports = function () {
   var map = new Map()
   var currentSymbol
 
@@ -69,9 +69,11 @@ module.exports = function (update) {
       if (result !== false && index + 1 === arr.length) {
         currentSymbol = symbol
 
-        callback(params, function (payload) {
+        callback(params, function (done) {
           if (symbol === currentSymbol) {
-            update(payload)
+            if (typeof done === 'function') {
+              done()
+            }
           }
         })
       }

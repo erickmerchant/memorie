@@ -33,14 +33,20 @@ var loop = mainLoop(state, function (state) {
     </div>
     <div class="center">
       ${state.error ? hx`<div class="block p2 bg-purple white">${state.error.message}</div>` : ''}
-      ${state.mode === 'create' ? viewItem(undefined) : ''}
-      ${(state.tasks || []).map((item) => {
-        return state.mode === 'edit' && item.id === state.task.id ? viewItem(state.task) : hx`<a class="col col-12 p2 border-bottom border-silver block black" href="/edit/${item.id}">${item.title || 'untitled'}</a>`
-      })}
+      ${state.mode === 'create' ? form() : ''}
+      ${(state.tasks || []).map(row)}
     </div>
   </div>`
 
-  function viewItem (task) {
+  function row (task) {
+    if (state.mode === 'edit' && task.id === state.task.id) {
+      return form(task)
+    }
+
+    return hx`<a class="col col-12 p2 border-bottom border-silver block black" href="/edit/${task.id}">${task.title || 'untitled'}</a>`
+  }
+
+  function form (task) {
     return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? editItem(task.id) : createItem}>
       <div class="black pb2 max-width-2 mx-auto">
         <label class="block my2">
@@ -58,57 +64,59 @@ var loop = mainLoop(state, function (state) {
   }
 }, loopOptions)
 
-var router = require('./router')(loop.update)
+var router = require('./router')()
 
-router.add([''], function (params, update) {
+router.add([''], function (params, done) {
   fetch.getJson('/api/tasks').then(function (tasks) {
-    update({mode: 'list', tasks})
+    done(function () {
+      loop.update({mode: 'list', tasks})
+    })
   })
 })
 
-router.add(['create'], function (params, update) {
+router.add(['create'], function (params, done) {
   fetch.getJson('/api/tasks').then(function (tasks) {
-    update({mode: 'create', tasks})
+    done(function () {
+      loop.update({mode: 'create', tasks})
+    })
   })
 })
 
-router.add(['edit', ':id'], function (params, update) {
+router.add(['edit', ':id'], function (params, done) {
   Promise.all([
     fetch.getJson('/api/tasks'),
     fetch.getJson('/api/tasks/' + params.id)
   ]).then(function ([tasks, task]) {
-    update({mode: 'edit', tasks, task})
+    done(function () {
+      loop.update({mode: 'edit', tasks, task})
+    })
   })
 })
 
-router.add(['create', ':data'], function (params, update) {
+router.add(['create', ':data'], function (params, done) {
   fetch.postJson('/api/tasks', params.data)
   .then(function () {
     fetch.getJson('/api/tasks').then(function (tasks) {
-      update({mode: 'list', tasks})
-
-      showPage.push('/')
+      done(function () {
+        showPage('/')
+      })
     })
   })
 })
 
-router.add(['edit', ':id', ':data'], function (params, update) {
+router.add(['edit', ':id', ':data'], function (params, done) {
   fetch.putJson('/api/tasks/' + params.id, params.data)
   .then(function () {
-    fetch.getJson('/api/tasks').then(function (tasks) {
-      update({mode: 'list', tasks})
-
-      showPage.push('/')
+    done(function () {
+      showPage('/')
     })
   })
 })
 
-router.add(['delete', ':id'], function (params, update) {
+router.add(['delete', ':id'], function (params, done) {
   fetch.deleteJson('/api/tasks/' + params.id).then(function () {
-    fetch.getJson('/api/tasks').then(function (tasks) {
-      update({mode: 'list', tasks})
-
-      showPage.push('/')
+    done(function () {
+      showPage('/')
     })
   })
 })
