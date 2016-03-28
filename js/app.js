@@ -64,7 +64,7 @@ var loop = mainLoop(state, function (state) {
   }
 }, loopOptions)
 
-var router = require('./router')()
+var router = require('@erickmerchant/router')()
 
 router.add([''], function (params, done) {
   fetch.getJson('/api/tasks').then(function (tasks) {
