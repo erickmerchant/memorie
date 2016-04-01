@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "js": "browserify -t hyperxify -t [ babelify --presets [ es2015 ] ] js/app.js > static/app.js && uglifyjs static/app.js --compress --mangle --output static/app.js",
+    "js": "browserify -t hyperxify -t [ babelify --presets [ es2015 ] ] js/app.js -o static/app.js && uglifyjs static/app.js --compress --mangle -o static/app.js",
     "js-watch": "watchify -t hyperxify -t [ babelify --presets [ es2015 ] ] -o static/app.js js/app.js",
     "css": "postcss -u postcss-import -u postcss-url -u postcss-cssnext -u cssnano -d static css/app.css",
     "css-watch": "postcss -u postcss-import -u postcss-url -u postcss-cssnext -d static css/app.css -w",
@@ -42,6 +42,7 @@
     "simple-fetch": "^1.2.1",
     "single-page": "^1.1.0",
     "standard": "^6.0.4",
+    "uglify-js": "^2.6.2",
     "virtual-dom": "^2.1.1",
     "watchify": "^3.7.0"
   },
