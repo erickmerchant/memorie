@@ -4,6 +4,7 @@ var catchLinks = require('catch-links')
 var singlePage = require('single-page')
 var vdom = require('virtual-dom')
 var hyperx = require('hyperx')
+var trim = require('lodash.trim')
 var mainLoop = require('main-loop')
 var VText = require('virtual-dom/vnode/vtext')
 var hx = hyperx(vdom.h)
@@ -66,7 +67,7 @@ var loop = mainLoop(state, function (state) {
 
 var router = require('@erickmerchant/router')()
 
-router.add([''], function (params, done) {
+router.add([''], function (data, done) {
   fetch.getJson('/api/tasks').then(function (tasks) {
     done(function () {
       loop.update({mode: 'list', tasks})
@@ -74,7 +75,7 @@ router.add([''], function (params, done) {
   })
 })
 
-router.add(['create'], function (params, done) {
+router.add(['create'], function (data, done) {
   fetch.getJson('/api/tasks').then(function (tasks) {
     done(function () {
       loop.update({mode: 'create', tasks})
@@ -82,10 +83,10 @@ router.add(['create'], function (params, done) {
   })
 })
 
-router.add(['edit', ':id'], function (params, done) {
+router.add(['edit', ':id'], function (data, done) {
   Promise.all([
     fetch.getJson('/api/tasks'),
-    fetch.getJson('/api/tasks/' + params.id)
+    fetch.getJson('/api/tasks/' + data.id)
   ]).then(function ([tasks, task]) {
     done(function () {
       loop.update({mode: 'edit', tasks, task})
@@ -93,8 +94,8 @@ router.add(['edit', ':id'], function (params, done) {
   })
 })
 
-router.add(['create', ':data'], function (params, done) {
-  fetch.postJson('/api/tasks', params.data)
+router.add(['create', ':data'], function (data, done) {
+  fetch.postJson('/api/tasks', data.data)
   .then(function () {
     fetch.getJson('/api/tasks').then(function (tasks) {
       done(function () {
@@ -104,8 +105,8 @@ router.add(['create', ':data'], function (params, done) {
   })
 })
 
-router.add(['edit', ':id', ':data'], function (params, done) {
-  fetch.putJson('/api/tasks/' + params.id, params.data)
+router.add(['edit', ':id', ':data'], function (data, done) {
+  fetch.putJson('/api/tasks/' + data.id, data.data)
   .then(function () {
     done(function () {
       showPage('/')
@@ -113,8 +114,8 @@ router.add(['edit', ':id', ':data'], function (params, done) {
   })
 })
 
-router.add(['delete', ':id'], function (params, done) {
-  fetch.deleteJson('/api/tasks/' + params.id).then(function () {
+router.add(['delete', ':id'], function (data, done) {
+  fetch.deleteJson('/api/tasks/' + data.id).then(function () {
     done(function () {
       showPage('/')
     })
@@ -122,9 +123,7 @@ router.add(['delete', ':id'], function (params, done) {
 })
 
 var showPage = singlePage(function (href) {
-  var route = href.split('/').filter((v) => !!v)
-
-  router.match(route.length ? route : [''])
+  router.match(trim(href, '/').split('/'))
 })
 
 catchLinks(window, function (href) {

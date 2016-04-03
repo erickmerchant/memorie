@@ -31,6 +31,7 @@
     "cssnano": "^3.5.2",
     "hyperx": "^2.0.2",
     "hyperxify": "^2.0.1",
+    "lodash.trim": "^4.2.0",
     "main-loop": "^3.2.0",
     "node-pg-migrate": "0.0.9",
     "nodemon": "^1.8.1",
