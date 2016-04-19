@@ -57,14 +57,12 @@ pg.connect(databaseURL, function (err, client) {
 
   app.post('/api/tasks', function (req, res, next) {
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
-    assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
     assert.string(req.body.title, 'Title must be a string')
-    assert.string(req.body.content, 'Content must be a string')
 
     client.query({
       name: 'insert-task',
-      text: 'INSERT INTO task (title, content) VALUES ($1, $2) RETURNING id',
-      values: [req.body.title, req.body.content]
+      text: 'INSERT INTO task (title) VALUES ($1) RETURNING id',
+      values: [req.body.title]
     }, function (err, result) {
       if (err) {
         next(err)
@@ -78,14 +76,12 @@ pg.connect(databaseURL, function (err, client) {
 
   app.put('/api/tasks/:id', function (req, res, next) {
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
-    assert.ok(typeof req.body.content !== 'undefined', 'Content is required')
     assert.string(req.body.title, 'Title must be a string')
-    assert.string(req.body.content, 'Content must be a string')
 
     client.query({
       name: 'update-task',
-      text: 'UPDATE task SET title = $2, content = $3 WHERE id = $1',
-      values: [req.params.id, req.body.title, req.body.content]
+      text: 'UPDATE task SET title = $2 WHERE id = $1',
+      values: [req.params.id, req.body.title]
     }, function (err, result) {
       if (err) {
         next(err)

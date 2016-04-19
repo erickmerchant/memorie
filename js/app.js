@@ -29,14 +29,12 @@ var loop = mainLoop(state, function (state) {
 
   return hx`<div>
     <div class="flex white bg-maroon p2 bold">
-      <span class="flex-auto h3">Memorie</span>
+      <a class="white flex-auto h3" href="/">Memorie</a>
       <a class="white self-center" href="/create">+ Add</a>
     </div>
-    <div class="center">
-      ${state.error ? hx`<div class="block p2 bg-purple white">${state.error.message}</div>` : ''}
-      ${state.mode === 'create' ? form() : ''}
-      ${(state.tasks || []).map(row)}
-    </div>
+    ${state.error ? hx`<div class="block p2 bg-fuchsia white">${state.error.message}</div>` : ''}
+    ${state.mode === 'create' ? form() : ''}
+    ${(state.tasks || []).map(row)}
   </div>`
 
   function row (task) {
@@ -44,22 +42,17 @@ var loop = mainLoop(state, function (state) {
       return form(task)
     }
 
-    return hx`<a class="col col-12 p2 border-bottom border-silver block black" href="/edit/${task.id}">${task.title || 'untitled'}</a>`
+    return hx`<a class="col col-12 p2 center border-bottom border-silver block black" href="/edit/${task.id}">${task.title || 'untitled'}</a>`
   }
 
   function form (task) {
     return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? editItem(task.id) : createItem}>
       <div class="black pb2 max-width-2 mx-auto">
         <label class="block my2">
-          Title
           <input class="p1 input" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
         </label>
-        <label class="block my2">
-          Content
-          <textarea class="p1 textarea" type="text" placeholder="" name="content">${task ? task.content : ''}</textarea>
-        </label>
-        <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="submit">Save</button></div>
-        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-purple" type="button" onclick=${deleteItem(task.id)}>Delete</button></div>` : ''}
+        <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></div>
+        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${deleteItem(task.id)}>Delete</button></div>` : ''}
       </div>
     </form>`
   }
@@ -136,8 +129,7 @@ function createItem (e) {
   e.preventDefault()
 
   router.match(['create', {
-    title: this.title.value,
-    content: this.content.value
+    title: this.title.value
   }])
 }
 
@@ -146,8 +138,7 @@ function editItem (id) {
     e.preventDefault()
 
     router.match(['edit', id, {
-      title: this.title.value,
-      content: this.content.value
+      title: this.title.value
     }])
   }
 }
