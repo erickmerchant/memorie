@@ -21,16 +21,22 @@ var loop = mainLoop(state, function (state) {
 
   process.nextTick(function () {
     var form = document.querySelector('form')
+    var input = document.querySelector('input')
 
     if (form) {
       scrollIntoView(form)
+    }
+
+    if (input) {
+      input.focus()
     }
   })
 
   return hx`<div>
     <div class="flex white bg-maroon p2 bold">
-      <a class="white flex-auto h3" href="/">Memorie</a>
-      <a class="white self-center" href="/create">+ Add</a>
+      <a class="white h3" href="/">Memorie</a>
+      <span class="flex-auto"></span>
+      <a class="white self-center" href="/create">Add</a>
     </div>
     ${state.error ? hx`<div class="block p2 bg-fuchsia white">${state.error.message}</div>` : ''}
     ${state.mode === 'create' ? form() : ''}
