@@ -1,24 +1,8 @@
 var fetch = require('simple-fetch')
 var scrollIntoView = require('scroll-into-view')
-var catchLinks = require('catch-links')
-var singlePage = require('single-page')
-var vdom = require('virtual-dom')
-var hyperx = require('hyperx')
-var trim = require('lodash.trim')
-var mainLoop = require('main-loop')
-var VText = require('virtual-dom/vnode/vtext')
-var hx = hyperx(vdom.h)
-var loopOptions = {
-  create: require('virtual-dom/create-element'),
-  diff: require('virtual-dom/diff'),
-  patch: require('virtual-dom/patch')
-}
-var state = {}
-var loop = mainLoop(state, function (state) {
-  if (!state) {
-    return new VText('')
-  }
-
+var framework = require('./framework.js')
+var hx = framework.hx
+var app = framework(function (state) {
   process.nextTick(function () {
     var form = document.querySelector('form')
     var input = document.querySelector('input')
@@ -38,7 +22,7 @@ var loop = mainLoop(state, function (state) {
       <span class="flex-auto"></span>
       <a class="white self-center" href="/create">Add</a>
     </div>
-    ${state.error ? hx`<div class="block p2 bg-fuchsia white">${state.error.message}</div>` : ''}
+    ${state.error ? hx`<div class="block m1 p2 bg-fuchsia white">${state.error.message}</div>` : ''}
     ${state.mode === 'create' ? form() : ''}
     ${(state.tasks || []).map(row)}
   </div>`
@@ -62,79 +46,92 @@ var loop = mainLoop(state, function (state) {
       </div>
     </form>`
   }
-}, loopOptions)
+})
 
-var router = require('@erickmerchant/router')()
-
-router.add([''], function (data, done) {
-  fetch.getJson('/api/tasks').then(function (tasks) {
+app.add([''], function (data, done) {
+  fetch.getJson('/api/tasks')
+  .then(function (tasks) {
     done(function () {
-      loop.update({mode: 'list', tasks})
+      app.update({mode: 'list', tasks})
     })
+  })
+  .catch(function (error) {
+    app.update({mode: 'error', error})
   })
 })
 
-router.add(['create'], function (data, done) {
-  fetch.getJson('/api/tasks').then(function (tasks) {
+app.add(['create'], function (data, done) {
+  fetch.getJson('/api/tasks')
+  .then(function (tasks) {
     done(function () {
-      loop.update({mode: 'create', tasks})
+      app.update({mode: 'create', tasks})
     })
+  })
+  .catch(function (error) {
+    app.update({mode: 'error', error})
   })
 })
 
-router.add(['edit', ':id'], function (data, done) {
+app.add(['edit', ':id'], function (data, done) {
   Promise.all([
     fetch.getJson('/api/tasks'),
     fetch.getJson('/api/tasks/' + data.id)
-  ]).then(function ([tasks, task]) {
+  ])
+  .then(function ([tasks, task]) {
     done(function () {
-      loop.update({mode: 'edit', tasks, task})
+      app.update({mode: 'edit', tasks, task})
     })
+  })
+  .catch(function (error) {
+    app.update({mode: 'error', error})
   })
 })
 
-router.add(['create', ':data'], function (data, done) {
+app.add(['create', ':data'], function (data, done) {
   fetch.postJson('/api/tasks', data.data)
   .then(function () {
-    fetch.getJson('/api/tasks').then(function (tasks) {
-      done(function () {
-        showPage('/')
-      })
+    return fetch.getJson('/api/tasks')
+  })
+  .then(function (tasks) {
+    done(function () {
+      app.show('/')
     })
+  })
+  .catch(function (error) {
+    app.update({mode: 'error', error})
   })
 })
 
-router.add(['edit', ':id', ':data'], function (data, done) {
+app.add(['edit', ':id', ':data'], function (data, done) {
   fetch.putJson('/api/tasks/' + data.id, data.data)
   .then(function () {
     done(function () {
-      showPage('/')
+      app.show('/')
     })
+  })
+  .catch(function (error) {
+    app.update({mode: 'error', error})
   })
 })
 
-router.add(['delete', ':id'], function (data, done) {
-  fetch.deleteJson('/api/tasks/' + data.id).then(function () {
+app.add(['delete', ':id'], function (data, done) {
+  fetch.deleteJson('/api/tasks/' + data.id)
+  .then(function () {
     done(function () {
-      showPage('/')
+      app.show('/')
     })
+  })
+  .catch(function (error) {
+    app.update({mode: 'error', error})
   })
 })
 
-var showPage = singlePage(function (href) {
-  router.match(trim(href, '/').split('/'))
-})
-
-catchLinks(window, function (href) {
-  showPage(href)
-})
-
-document.querySelector('main').appendChild(loop.target)
+document.querySelector('main').appendChild(app.target)
 
 function createItem (e) {
   e.preventDefault()
 
-  router.match(['create', {
+  app.match(['create', {
     title: this.title.value
   }])
 }
@@ -143,7 +140,7 @@ function editItem (id) {
   return function (e) {
     e.preventDefault()
 
-    router.match(['edit', id, {
+    app.match(['edit', id, {
       title: this.title.value
     }])
   }
@@ -153,6 +150,6 @@ function deleteItem (id) {
   return function (e) {
     e.preventDefault()
 
-    router.match(['delete', id])
+    app.match(['delete', id])
   }
 }

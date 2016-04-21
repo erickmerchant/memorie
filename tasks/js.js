@@ -10,7 +10,7 @@ function js () {
   var bundle = browserify({})
 
   bundle.add('js/app.js')
-  bundle.transform('hyperxify')
+  // bundle.transform('hyperxify')
   bundle.transform('babelify', { presets: [ 'es2015' ] })
   bundle.transform({ global: true }, 'uglifyify')
   bundle.bundle().pipe(bundleFs)
