@@ -88,7 +88,7 @@ pg.connect(databaseURL, function (err, client) {
       } else {
         res.status(200)
 
-        res.send({id: req.params.id})
+        res.json({id: parseInt(req.params.id)})
       }
     })
   })
@@ -104,7 +104,7 @@ pg.connect(databaseURL, function (err, client) {
       } else {
         res.status(200)
 
-        res.send({id: req.params.id})
+        res.json({id: parseInt(req.params.id)})
       }
     })
   })

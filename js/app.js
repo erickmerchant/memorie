@@ -2,6 +2,7 @@ var fetch = require('simple-fetch')
 var scrollIntoView = require('scroll-into-view')
 var framework = require('./framework.js')
 var hx = framework.hx
+var loading = 0
 var app = framework(function (state) {
   process.nextTick(function () {
     var form = document.querySelector('form')
@@ -19,7 +20,9 @@ var app = framework(function (state) {
   return hx`<div>
     <div class="flex white bg-maroon p2 bold">
       <a class="white h3" href="/">Memorie</a>
-      <span class="flex-auto"></span>
+      <span class="flex-auto">
+        ${loading ? hx`<img src="/loading.svg" class="flex-center mx-auto" height="24">` : ''}
+      </span>
       <a class="white self-center" href="/create">Add</a>
     </div>
     ${state.error ? hx`<div class="block m1 p2 bg-fuchsia white">${state.error.message}</div>` : ''}
@@ -126,7 +129,13 @@ app.add(['delete', ':id'], function (data, done) {
   })
 })
 
-document.querySelector('main').appendChild(app.target)
+setTimeout(function () {
+  var main = document.querySelector('main')
+
+  main.innerHTML = ''
+
+  main.appendChild(app.target)
+}, 2000)
 
 function createItem (e) {
   e.preventDefault()
