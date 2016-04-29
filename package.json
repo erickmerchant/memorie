@@ -25,7 +25,7 @@
     "catch-links": "^2.0.0",
     "chokidar": "^1.4.3",
     "cssnano": "^3.5.2",
-    "fs-extra": "^0.28.0",
+    "fs-extra": "^0.30.0",
     "hyperx": "^2.0.2",
     "hyperxify": "^2.0.1",
     "loading-svg": "^1.0.0",
