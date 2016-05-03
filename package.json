@@ -39,7 +39,7 @@
     "postcss-custom-properties": "^5.0.0",
     "postcss-import": "^8.1.0",
     "scroll-into-view": "^1.6.0",
-    "sergeant": "^10.1.0",
+    "sergeant": "^11.0.0",
     "simple-fetch": "^1.2.1",
     "single-page": "^1.1.0",
     "standard": "^7.0.0",
