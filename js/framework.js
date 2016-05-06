@@ -2,7 +2,6 @@ var catchLinks = require('catch-links')
 var singlePage = require('single-page')
 var vdom = require('virtual-dom')
 var hyperx = require('hyperx')
-var trim = require('lodash.trim')
 var mainLoop = require('main-loop')
 var VText = require('virtual-dom/vnode/vtext')
 var hx = hyperx(vdom.h)
@@ -24,7 +23,7 @@ function framework (view) {
   var router = require('@erickmerchant/router')()
 
   var show = singlePage(function (href) {
-    router.match(trim(href, '/').split('/'))
+    router.match(href)
   })
 
   catchLinks(window, function (href) {
