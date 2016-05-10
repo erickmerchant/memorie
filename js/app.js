@@ -2,8 +2,23 @@ var fetch = require('simple-fetch')
 var scrollIntoView = require('scroll-into-view')
 var framework = require('./framework.js')
 var hx = framework.hx
-var loading = 0
-var app = framework(function (state) {
+var app = framework(view)
+
+app.add('', routeIndex)
+
+app.add('create', routeCreate)
+
+app.add('edit/:id', routeEdit)
+
+setTimeout(function () {
+  var main = document.querySelector('main')
+
+  main.innerHTML = ''
+
+  main.appendChild(app.target)
+}, 1500)
+
+function view (state) {
   process.nextTick(function () {
     var form = document.querySelector('form')
     var input = document.querySelector('input')
@@ -21,7 +36,6 @@ var app = framework(function (state) {
     <div class="flex white bg-maroon p2 bold">
       <a class="white h3" href="/">Memorie</a>
       <span class="flex-auto">
-        ${loading ? hx`<img src="/loading.svg" class="flex-center mx-auto" height="24">` : ''}
       </span>
       <a class="white self-center" href="/create">Add</a>
     </div>
@@ -39,19 +53,19 @@ var app = framework(function (state) {
   }
 
   function form (task) {
-    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? editItem(task.id, state.done) : createItem(state.done)}>
+    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? makeEdit(task.id, state.done) : makeCreate(state.done)}>
       <div class="black pb2 max-width-2 mx-auto">
         <label class="block my2">
           <input class="p1 input" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
         </label>
         <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></div>
-        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${deleteItem(task.id, state.done)}>Delete</button></div>` : ''}
+        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${makeDelete(task.id, state.done)}>Delete</button></div>` : ''}
       </div>
     </form>`
   }
-})
+}
 
-app.add('', function (params, done) {
+function routeIndex (params, done) {
   fetch.getJson('/api/tasks')
   .then(function (tasks) {
     done(function () {
@@ -61,9 +75,9 @@ app.add('', function (params, done) {
   .catch(function (error) {
     app.update({mode: 'error', error, done})
   })
-})
+}
 
-app.add('create', function (params, done) {
+function routeCreate (params, done) {
   fetch.getJson('/api/tasks')
   .then(function (tasks) {
     done(function () {
@@ -73,9 +87,9 @@ app.add('create', function (params, done) {
   .catch(function (error) {
     app.update({mode: 'error', error, done})
   })
-})
+}
 
-app.add('edit/:id', function (params, done) {
+function routeEdit (params, done) {
   Promise.all([
     fetch.getJson('/api/tasks'),
     fetch.getJson('/api/tasks/' + params.id)
@@ -88,17 +102,9 @@ app.add('edit/:id', function (params, done) {
   .catch(function (error) {
     app.update({mode: 'error', error, done})
   })
-})
+}
 
-setTimeout(function () {
-  var main = document.querySelector('main')
-
-  main.innerHTML = ''
-
-  main.appendChild(app.target)
-}, 1500)
-
-function createItem (done) {
+function makeCreate (done) {
   return function (e) {
     e.preventDefault()
 
@@ -119,7 +125,7 @@ function createItem (done) {
   }
 }
 
-function editItem (id, done) {
+function makeEdit (id, done) {
   return function (e) {
     e.preventDefault()
 
@@ -137,7 +143,7 @@ function editItem (id, done) {
   }
 }
 
-function deleteItem (id, done) {
+function makeDelete (id, done) {
   return function (e) {
     e.preventDefault()
 
