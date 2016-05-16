@@ -19,6 +19,8 @@ setTimeout(function () {
 }, 1500)
 
 function view (state) {
+  var done = state.done
+
   process.nextTick(function () {
     var form = document.querySelector('form')
     var input = document.querySelector('input')
@@ -53,15 +55,70 @@ function view (state) {
   }
 
   function form (task) {
-    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? makeEdit(task.id, state.done) : makeCreate(state.done)}>
+    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? onEdit(task.id) : onCreate()}>
       <div class="black pb2 max-width-2 mx-auto">
         <label class="block my2">
           <input class="p1 input" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
         </label>
         <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></div>
-        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${makeDelete(task.id, state.done)}>Delete</button></div>` : ''}
+        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${onDelete(task.id)}>Delete</button></div>` : ''}
       </div>
     </form>`
+  }
+
+  function onCreate () {
+    return function (e) {
+      e.preventDefault()
+
+      fetch.postJson('/api/tasks', {
+        title: this.title.value
+      })
+      .then(function () {
+        return fetch.getJson('/api/tasks')
+      })
+      .then(function (tasks) {
+        done(function () {
+          app.show('/')
+        })
+      })
+      .catch(function (error) {
+        app.update({mode: 'error', error, done})
+      })
+    }
+  }
+
+  function onEdit (id) {
+    return function (e) {
+      e.preventDefault()
+
+      fetch.putJson('/api/tasks/' + id, {
+        title: this.title.value
+      })
+      .then(function () {
+        done(function () {
+          app.show('/')
+        })
+      })
+      .catch(function (error) {
+        app.update({mode: 'error', error, done})
+      })
+    }
+  }
+
+  function onDelete (id) {
+    return function (e) {
+      e.preventDefault()
+
+      fetch.deleteJson('/api/tasks/' + id)
+      .then(function () {
+        done(function () {
+          app.show('/')
+        })
+      })
+      .catch(function (error) {
+        app.update({mode: 'error', error, done})
+      })
+    }
   }
 }
 
@@ -102,59 +159,4 @@ function routeEdit (params, done) {
   .catch(function (error) {
     app.update({mode: 'error', error, done})
   })
-}
-
-function makeCreate (done) {
-  return function (e) {
-    e.preventDefault()
-
-    fetch.postJson('/api/tasks', {
-      title: this.title.value
-    })
-    .then(function () {
-      return fetch.getJson('/api/tasks')
-    })
-    .then(function (tasks) {
-      done(function () {
-        app.show('/')
-      })
-    })
-    .catch(function (error) {
-      app.update({mode: 'error', error, done})
-    })
-  }
-}
-
-function makeEdit (id, done) {
-  return function (e) {
-    e.preventDefault()
-
-    fetch.putJson('/api/tasks/' + id, {
-      title: this.title.value
-    })
-    .then(function () {
-      done(function () {
-        app.show('/')
-      })
-    })
-    .catch(function (error) {
-      app.update({mode: 'error', error, done})
-    })
-  }
-}
-
-function makeDelete (id, done) {
-  return function (e) {
-    e.preventDefault()
-
-    fetch.deleteJson('/api/tasks/' + id)
-    .then(function () {
-      done(function () {
-        app.show('/')
-      })
-    })
-    .catch(function (error) {
-      app.update({mode: 'error', error, done})
-    })
-  }
 }
