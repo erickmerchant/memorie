@@ -1,42 +1,74 @@
-var catchLinks = require('catch-links')
-var singlePage = require('single-page')
-var vdom = require('virtual-dom')
-var hyperx = require('hyperx')
-var mainLoop = require('main-loop')
-var VText = require('virtual-dom/vnode/vtext')
-var hx = hyperx(vdom.h)
-var loopOptions = {
+const redux = require('redux')
+const createStore = redux.createStore
+const applyMiddleware = redux.applyMiddleware
+const combineReducers = redux.combineReducers
+const thunk = require('redux-thunk').default
+const Router = require('@erickmerchant/router')
+const catchLinks = require('catch-links')
+const singlePage = require('single-page')
+const vdom = require('virtual-dom')
+const hyperx = require('hyperx')
+const mainLoop = require('main-loop')
+const hx = hyperx(vdom.h)
+const loopOptions = {
   create: require('virtual-dom/create-element'),
   diff: require('virtual-dom/diff'),
   patch: require('virtual-dom/patch')
 }
-var state = {}
+const ROUTE = Symbol()
 
-function framework (view) {
-  var loop = mainLoop(state, function (state) {
-    if (!state) {
-      return new VText('')
-    }
+function framework (reducers, view) {
+  reducers.context = contextReducer
 
-    return view(state)
-  }, loopOptions)
-  var router = require('@erickmerchant/router')()
+  var store = createStore(
+    combineReducers(reducers),
+    applyMiddleware(thunk)
+  )
+  var routes = new Map()
+  var router = Router()
+  var loop = mainLoop(store.getState(), view, loopOptions)
 
   var show = singlePage(function (href) {
-    router.match(href)
+    var context = router.match(href)
+
+    store.dispatch({type: ROUTE, context})
+
+    if (context != null && routes.has(context.route)) {
+      store.dispatch(routes.get(context.route)(context))
+    }
   })
 
-  catchLinks(window, function (href) {
-    show(href)
-  })
+  store.subscribe(update)
+
+  catchLinks(window, show)
 
   return {
+    loop,
     show,
-    update: loop.update,
-    target: loop.target,
-    state: loop.state,
-    add: router.add,
-    match: router.match
+    route,
+    store
+  }
+
+  function contextReducer (state = {params: {}, route: ''}, action) {
+    if (action.type === ROUTE) {
+      state = action.context
+    }
+
+    return state
+  }
+
+  function update () {
+    console.log(store.getState())
+
+    loop.update(store.getState())
+  }
+
+  function route (route, thunk) {
+    if (thunk) {
+      routes.set(route, thunk)
+    }
+
+    router.add(route)
   }
 }
 
