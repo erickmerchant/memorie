@@ -1,15 +1,7 @@
-const END = Symbol()
-
-function isLoading (state = true, action) {
-  if (action.type === END) {
+module.exports = function (state = true, action) {
+  if (action.type === 'LOADED') {
     return false
   }
 
   return state
 }
-
-isLoading.end = function () {
-  return {type: END}
-}
-
-module.exports = isLoading

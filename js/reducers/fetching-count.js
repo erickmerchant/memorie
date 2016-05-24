@@ -1,24 +1,11 @@
-const INCREMENT = Symbol()
-const DECREMENT = Symbol()
-
-function fetchingCount (state = 0, action) {
-  if (action.type === INCREMENT) {
+module.exports = function (state = 0, action) {
+  if (action.type === 'INCREMENT_FETCHING_COUNT') {
     return state + 1
   }
 
-  if (action.type === DECREMENT) {
+  if (action.type === 'DECREMENT_FETCHING_COUNT') {
     return state - 1
   }
 
   return state
 }
-
-fetchingCount.increment = function () {
-  return { type: INCREMENT }
-}
-
-fetchingCount.decrement = function () {
-  return { type: DECREMENT }
-}
-
-module.exports = fetchingCount

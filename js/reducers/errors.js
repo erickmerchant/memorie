@@ -1,15 +1,7 @@
-const ADD = Symbol()
-
-function errors (state = [], action) {
-  if (action.type === ADD) {
+module.exports = function (state = [], action) {
+  if (action.type === 'ADD_ERROR') {
     state.push(action.error)
   }
 
   return state
 }
-
-errors.add = function (error) {
-  return {type: ADD, error}
-}
-
-module.exports = errors

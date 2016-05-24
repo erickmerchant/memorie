@@ -1,18 +1,13 @@
-const POPULATE = Symbol()
-const ADD = Symbol()
-const SAVE = Symbol()
-const REMOVE = Symbol()
-
-function tasks (state = [], action) {
-  if (action.type === POPULATE) {
+module.exports = function (state = [], action) {
+  if (action.type === 'POPULATE_TASKS') {
     return action.tasks
   }
 
-  if (action.type === ADD) {
+  if (action.type === 'ADD_TASK') {
     state.unshift(action.task)
   }
 
-  if (action.type === SAVE) {
+  if (action.type === 'SAVE_TASK') {
     state = state.map(function (task) {
       if (task.id === action.task.id) {
         return action.task
@@ -22,7 +17,7 @@ function tasks (state = [], action) {
     })
   }
 
-  if (action.type === REMOVE) {
+  if (action.type === 'REMOVE_TASK') {
     state = state.filter(function (task) {
       return task.id !== action.id
     })
@@ -30,21 +25,3 @@ function tasks (state = [], action) {
 
   return state
 }
-
-tasks.populate = function (tasks) {
-  return { type: POPULATE, tasks }
-}
-
-tasks.add = function (task) {
-  return { type: ADD, task }
-}
-
-tasks.save = function (task) {
-  return { type: SAVE, task }
-}
-
-tasks.remove = function (id) {
-  return { type: REMOVE, id }
-}
-
-module.exports = tasks

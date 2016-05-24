@@ -1,34 +1,49 @@
 const fetch = require('simple-fetch')
 const scrollIntoView = require('scroll-into-view')
-const framework = require('./framework.js')
-const hx = framework.hx
+const redux = require('redux')
+const vdom = require('virtual-dom')
+const hyperx = require('hyperx')
+const mainLoop = require('main-loop')
+const catchLinks = require('catch-links')
+const singlePage = require('single-page')
 const reducers = {
+  context: require('./reducers/context.js')(['', 'edit/:id', 'create']),
   errors: require('./reducers/errors.js'),
   fetchingCount: require('./reducers/fetching-count.js'),
   isLoading: require('./reducers/is-loading.js'),
   tasks: require('./reducers/tasks.js')
 }
-const app = framework(reducers, view)
-const dispatch = app.store.dispatch
+const loopOptions = {
+  create: require('virtual-dom/create-element'),
+  diff: require('virtual-dom/diff'),
+  patch: require('virtual-dom/patch')
+}
+const hx = hyperx(vdom.h)
+const store = redux.createStore(redux.combineReducers(reducers))
+const loop = mainLoop(store.getState(), view, loopOptions)
+const dispatch = store.dispatch
+const show = singlePage(function (href) {
+  dispatch({type: 'CHANGE_LOCATION', href})
+})
 
-app.route('')
+store.subscribe(function () {
+  loop.update(store.getState())
+})
 
-app.route('create')
+catchLinks(window, show)
 
-app.route('edit/:id')
-
-document.querySelector('main').appendChild(app.loop.target)
+document.querySelector('main').appendChild(loop.target)
 
 fetch.getJson('/api/tasks')
 .then(function (tasks) {
-  dispatch(reducers.isLoading.end())
+  dispatch({type: 'LOADED'})
 
-  dispatch(reducers.tasks.populate(tasks))
+  dispatch({ type: 'POPULATE_TASKS', tasks })
 })
 .catch(function (error) {
-  dispatch(reducers.isLoading.end())
+  dispatch({type: 'LOADED'})
 
-  dispatch(reducers.errors.add(error))
+  dispatch({type: 'ADD_ERROR', error})
 })
 
 function view (state) {
@@ -53,17 +68,33 @@ function view (state) {
     <div class="flex white bg-maroon p2 bold">
       <a class="white h3" href="/">Memorie</a>
       <span class="flex-auto center">
-        ${state.fetchingCount > 0 ? hx`<img src="/loading.svg" style="height: 20px">` : ''}
+        ${fetchCount()}
       </span>
       <a class="white self-center" href="/create">Add</a>
     </div>
     ${state.errors.map(alert)}
-    ${state.context.route === 'create' ? form() : ''}
+    ${createForm()}
     ${state.tasks.map(row)}
   </div>`
 
+  function fetchCount () {
+    if (state.fetchingCount > 0) {
+      return hx`<img src="/loading.svg" style="height: 20px">`
+    }
+
+    return ''
+  }
+
   function alert (error) {
     return hx`<div class="block m1 p2 bg-fuchsia white">${error.message}</div>`
+  }
+
+  function createForm () {
+    if (state.context.route === 'create') {
+      return form()
+    }
+
+    return ''
   }
 
   function row (task) {
@@ -75,29 +106,25 @@ function view (state) {
   }
 
   function form (task) {
-    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? on(edit(task.id)) : on(create())}>
+    return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? edit(task.id) : create()}>
       <div class="black pb2 max-width-2 mx-auto">
         <label class="block my2">
           <input class="p1 input" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
         </label>
         <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></div>
-        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${on(remove(task.id))}>Delete</button></div>` : ''}
+        ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove(task.id)}>Delete</button></div>` : ''}
       </div>
     </form>`
-  }
-
-  function on (func) {
-    return function (e) {
-      e.preventDefault()
-
-      dispatch(func.bind(this))
-    }
   }
 }
 
 function create () {
-  return function (dispatch) {
-    dispatch(reducers.fetchingCount.increment())
+  return function (e) {
+    e.preventDefault()
+
+    show('/')
+
+    dispatch({ type: 'INCREMENT_FETCHING_COUNT' })
 
     var title = this.title.value
 
@@ -105,26 +132,28 @@ function create () {
       title
     })
     .then(function (task) {
-      dispatch(reducers.fetchingCount.decrement())
+      dispatch({ type: 'DECREMENT_FETCHING_COUNT' })
 
-      dispatch(reducers.tasks.add({
+      dispatch({ type: 'ADD_TASK', task: {
         id: task.id,
         title
-      }))
-
-      app.show('/')
+      }})
     })
     .catch(function (error) {
-      dispatch(reducers.fetchingCount.decrement())
+      dispatch({ type: 'DECREMENT_FETCHING_COUNT' })
 
-      dispatch(reducers.errors.add(error))
+      dispatch({type: 'ADD_ERROR', error})
     })
   }
 }
 
 function edit (id) {
-  return function (dispatch) {
-    dispatch(reducers.fetchingCount.increment())
+  return function (e) {
+    e.preventDefault()
+
+    show('/')
+
+    dispatch({ type: 'INCREMENT_FETCHING_COUNT' })
 
     var title = this.title.value
 
@@ -132,39 +161,39 @@ function edit (id) {
       title
     })
     .then(function (task) {
-      dispatch(reducers.fetchingCount.decrement())
+      dispatch({ type: 'DECREMENT_FETCHING_COUNT' })
 
-      dispatch(reducers.tasks.save({
+      dispatch({ type: 'SAVE_TASK', task: {
         id: task.id,
         title
-      }))
-
-      app.show('/')
+      }})
     })
     .catch(function (error) {
-      dispatch(reducers.fetchingCount.decrement())
+      dispatch({ type: 'DECREMENT_FETCHING_COUNT' })
 
-      dispatch(reducers.errors.add(error))
+      dispatch({type: 'ADD_ERROR', error})
     })
   }
 }
 
 function remove (id) {
-  return function (dispatch) {
-    dispatch(reducers.fetchingCount.increment())
+  return function (e) {
+    e.preventDefault()
+
+    show('/')
+
+    dispatch({ type: 'INCREMENT_FETCHING_COUNT' })
 
     fetch.deleteJson('/api/tasks/' + id)
     .then(function () {
-      dispatch(reducers.fetchingCount.decrement())
+      dispatch({ type: 'DECREMENT_FETCHING_COUNT' })
 
-      dispatch(reducers.tasks.remove(id))
-
-      app.show('/')
+      dispatch({ type: 'REMOVE_TASK', id })
     })
     .catch(function (error) {
-      dispatch(reducers.fetchingCount.decrement())
+      dispatch({ type: 'DECREMENT_FETCHING_COUNT' })
 
-      dispatch(reducers.errors.add(error))
+      dispatch({type: 'ADD_ERROR', error})
     })
   }
 }
