@@ -1,13 +1,14 @@
 const fetch = require('simple-fetch')
 const scrollIntoView = require('scroll-into-view')
 const redux = require('redux')
+const router = require('@erickmerchant/router')()
 const vdom = require('virtual-dom')
 const hyperx = require('hyperx')
 const mainLoop = require('main-loop')
 const catchLinks = require('catch-links')
 const singlePage = require('single-page')
 const reducers = {
-  context: require('./reducers/context.js')(['', 'edit/:id', 'create']),
+  location: require('./reducers/location.js'),
   errors: require('./reducers/errors.js'),
   fetchingCount: require('./reducers/fetching-count.js'),
   isLoading: require('./reducers/is-loading.js'),
@@ -22,8 +23,8 @@ const hx = hyperx(vdom.h)
 const store = redux.createStore(redux.combineReducers(reducers))
 const loop = mainLoop(store.getState(), view, loopOptions)
 const dispatch = store.dispatch
-const show = singlePage(function (href) {
-  dispatch({type: 'CHANGE_LOCATION', href})
+const show = singlePage(function (location) {
+  dispatch({type: 'CHANGE_LOCATION', location})
 })
 
 store.subscribe(function () {
@@ -46,7 +47,15 @@ fetch.getJson('/api/tasks')
   dispatch({type: 'ADD_ERROR', error})
 })
 
+router.add('')
+
+router.add('edit/:id')
+
+router.add('create')
+
 function view (state) {
+  var context = router.match(state.location)
+
   if (state.isLoading) {
     return hx`<div class="fixed flex top-0 left-0 bottom-0 right-0 bg-maroon"><img src="/loading.svg" class="flex-center mx-auto"></div>`
   }
@@ -90,7 +99,7 @@ function view (state) {
   }
 
   function createForm () {
-    if (state.context.route === 'create') {
+    if (context.route === 'create') {
       return form()
     }
 
@@ -98,7 +107,7 @@ function view (state) {
   }
 
   function row (task) {
-    if (state.context.route === 'edit/:id' && task.id === parseInt(state.context.params.id)) {
+    if (context.route === 'edit/:id' && task.id === parseInt(context.params.id)) {
       return form(task)
     }
 
