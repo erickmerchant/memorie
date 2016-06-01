@@ -16,6 +16,10 @@ exports.init = function () {
   }
 }
 
+exports.changeContext = function (context) {
+  return {type: 'SET_CONTEXT', context}
+}
+
 exports.createTask = function (title) {
   return function (dispatch) {
     dispatch({type: 'INCREMENT_FETCHING_COUNT'})

@@ -1,12 +1,21 @@
-const hx = require('./framework.js').hx
+const vdom = require('virtual-dom')
+const hyperx = require('hyperx')
+const hx = hyperx(vdom.h)
+const dispatch = require('./store.js').dispatch
 const actionCreators = require('./action-creators.js')
 const scrollIntoView = require('scroll-into-view')
-
+const catchLinks = require('catch-links')
+const singlePage = require('single-page')
 const router = require('@erickmerchant/router')(['', 'create', 'edit/:id'])
+const show = singlePage(function (location) {
+  var context = router.match(location)
 
-module.exports = function (state, {dispatch, show}) {
-  var context = router.match(state.location)
+  dispatch(actionCreators.changeContext(context))
+})
 
+catchLinks(window, show)
+
+module.exports = function (state, dispatch) {
   if (state.isLoading) {
     process.nextTick(function () {
       dispatch(actionCreators.init())
@@ -54,7 +63,7 @@ module.exports = function (state, {dispatch, show}) {
   }
 
   function createForm () {
-    if (context.route === 'create') {
+    if (state.context.route === 'create') {
       return form()
     }
 
@@ -62,7 +71,7 @@ module.exports = function (state, {dispatch, show}) {
   }
 
   function row (task) {
-    if (context.route === 'edit/:id' && task.id === parseInt(context.params.id)) {
+    if (state.context.route === 'edit/:id' && task.id === parseInt(state.context.params.id)) {
       return form(task)
     }
 
