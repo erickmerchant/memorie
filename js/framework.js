@@ -14,12 +14,12 @@ const thunk = require('redux-thunk').default
 module.exports = function (settings) {
   settings = Object.assign({
     reducers: {},
-    routes: [],
-    target: document.querySelector('body'),
+    middleware: [],
+    routes: {},
     defaultComponent: function () {
-
+      return hx``
     },
-    middleware: []
+    target: document.querySelector('body')
   }, settings)
 
   settings.reducers.context = contextReducer
@@ -31,26 +31,10 @@ module.exports = function (settings) {
   const dispatch = store.dispatch
   const components = new Map()
 
-  settings.routes.forEach(function (route) {
-    if (!Array.isArray(route)) {
-      components.set(route, settings.defaultComponent)
+  Object.keys(settings.routes).forEach(function (route) {
+    components.set(route, settings.routes[route])
 
-      router.add(route)
-    } else {
-      let component = route[1] || settings.defaultComponent
-
-      if (!Array.isArray(route[0])) {
-        components.set(route[0], component)
-
-        router.add(route[0])
-      } else {
-        route[0].forEach(function (route) {
-          components.set(route, component)
-
-          router.add(route)
-        })
-      }
-    }
+    router.add(route)
   })
 
   const show = singlePage(function (href) {
@@ -64,7 +48,11 @@ module.exports = function (settings) {
   const mainLoop = require('main-loop')
 
   const loop = mainLoop(store.getState(), function (state) {
-    const component = components.get(state.context.route)
+    let component = settings.defaultComponent
+
+    if (state.context && components.has(state.context.route)) {
+      component = components.get(state.context.route)
+    }
 
     return component(state, {dispatch, show, hx})
   }, loopOptions)
@@ -76,7 +64,7 @@ module.exports = function (settings) {
   settings.target.appendChild(loop.target)
 }
 
-function contextReducer (state = {route: '', params: {}}, action) {
+function contextReducer (state = null, action) {
   if (action.type === 'SET_CONTEXT') {
     return action.context
   }

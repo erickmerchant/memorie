@@ -5,9 +5,15 @@ const chokidar = require('chokidar')
 const browserify = require('browserify')
 const streamToPromise = require('stream-to-promise')
 
-function js () {
+function js (debug) {
   var bundleFs = fs.createWriteStream('static/app.js')
-  var bundle = browserify({})
+  var options = {}
+
+  if (debug) {
+    options.debug = true
+  }
+
+  var bundle = browserify(options)
 
   bundle.add('js/app.js')
   // bundle.transform('hyperxify')
@@ -19,9 +25,9 @@ function js () {
 }
 
 js.watch = function () {
-  return js().then(function () {
+  return js(true).then(function () {
     chokidar.watch('js/**/*.js', {ignoreInitial: true}).on('all', function () {
-      js().catch(console.error)
+      js(true).catch(console.error)
     })
 
     return true
