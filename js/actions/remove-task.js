@@ -4,16 +4,18 @@ module.exports = function (id) {
   return function (dispatch) {
     dispatch({type: 'INCREMENT_FETCHING_COUNT'})
 
-    fetch.deleteJson('/api/tasks/' + id)
+    var promise = fetch.deleteJson('/api/tasks/' + id)
     .then(function () {
-      dispatch({type: 'DECREMENT_FETCHING_COUNT'})
-
       dispatch({type: 'REMOVE_TASK', id})
     })
     .catch(function (error) {
-      dispatch({type: 'DECREMENT_FETCHING_COUNT'})
-
       dispatch({type: 'ADD_ERROR', error})
     })
+
+    setTimeout(function () {
+      promise.then(function () {
+        dispatch({type: 'DECREMENT_FETCHING_COUNT'})
+      })
+    }, 500)
   }
 }
