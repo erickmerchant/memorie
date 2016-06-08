@@ -54,7 +54,7 @@ module.exports = function (settings) {
       component = components.get(state.context.route)
     }
 
-    return component(state, {dispatch, show, hx})
+    return component(state, {dispatch, next, show, hx})
   }, loopOptions)
 
   store.subscribe(function () {
@@ -62,6 +62,10 @@ module.exports = function (settings) {
   })
 
   settings.target.appendChild(loop.target)
+}
+
+function next (callback) {
+  process.nextTick(callback)
 }
 
 function contextReducer (state = null, action) {

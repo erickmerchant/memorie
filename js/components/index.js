@@ -4,33 +4,37 @@ const actions = {
   init: require('../actions/init.js')
 }
 
-module.exports = function (state, {dispatch, show, hx}, main = defaultMain) {
+module.exports = function (state, app, main = defaultMain) {
+  var {dispatch, next, hx} = app
+
   if (state.isLoading) {
-    process.nextTick(function () {
+    next(function () {
       dispatch(actions.init())
     })
 
-    return unfound(state, {hx})
+    return unfound(state, app)
   }
 
   return hx`<div>
-    <div class="flex white bg-maroon p2 bold">
-      <a class="white h3" href="/">Memorie</a>
-      <span class="flex-auto center">
+    <div class="flex items-center clearfix white bg-maroon p2 bold">
+      <div class="col-4 left-align">
+        <a class="white h3" href="/">Memorie</a>
+      </div>
+      <div class="flex-auto center">
         ${fetchCount()}
-      </span>
-      <a class="white self-center" href="/create">Add</a>
+      </div>
+      <div class="col-4 right-align">
+        <a class="white" href="/create">Add</a>
+      </div>
     </div>
     ${state.errors.map(alert)}
-    ${main(state, {dispatch, show, hx})}
+    ${main(state, app)}
   </div>`
 
   function fetchCount () {
     if (state.fetchingCount > 0) {
       return hx`<img src="/loading.svg" style="height: 20px">`
     }
-
-    return ''
   }
 
   function alert (error) {
@@ -38,6 +42,8 @@ module.exports = function (state, {dispatch, show, hx}, main = defaultMain) {
   }
 }
 
-function defaultMain (state, {hx}) {
-  return hx`${state.tasks.map((task) => row(task, {hx}))}`
+function defaultMain (state, app) {
+  var {hx} = app
+
+  return hx`${state.tasks.map((task) => row(task, app))}`
 }

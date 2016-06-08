@@ -5,8 +5,10 @@ const actions = {
   removeTask: require('../../actions/remove-task.js')
 }
 
-module.exports = function (task, {dispatch, show, hx}) {
-  process.nextTick(function () {
+module.exports = function (task, app) {
+  var {dispatch, next, show, hx} = app
+
+  next(function () {
     var form = document.querySelector('form')
     var input = document.querySelector('input')
 
