@@ -12,13 +12,9 @@ module.exports = function (task, app) {
     var form = document.querySelector('form')
     var input = document.querySelector('input')
 
-    if (form) {
-      scrollIntoView(form)
-    }
+    scrollIntoView(form)
 
-    if (input) {
-      input.focus()
-    }
+    input.focus()
   })
 
   return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? edit(task.id) : create()}>
