@@ -1,15 +1,15 @@
-const framework = require('./framework.js')
+const framework = require('./framework')
 const reducers = {
-  errors: require('./reducers/errors.js'),
-  fetchingCount: require('./reducers/fetching-count.js'),
-  isLoading: require('./reducers/is-loading.js'),
-  tasks: require('./reducers/tasks.js')
+  errors: require('./reducers/errors'),
+  fetchingCount: require('./reducers/fetching-count'),
+  isLoading: require('./reducers/is-loading'),
+  tasks: require('./reducers/tasks')
 }
 const components = {
-  index: require('./components/index.js'),
-  create: require('./components/create.js'),
-  edit: require('./components/edit.js'),
-  unfound: require('./components/unfound.js')
+  index: require('./components/index'),
+  create: require('./components/create'),
+  edit: require('./components/edit'),
+  unfound: require('./components/unfound')
 }
 const routes = {
   '': components.index,

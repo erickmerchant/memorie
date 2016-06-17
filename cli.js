@@ -2,10 +2,10 @@
 
 const sergeant = require('sergeant')
 const app = sergeant().describe('Build CLI for Memorie')
-const css = require('./tasks/css.js')
-const js = require('./tasks/js.js')
-const svg = require('./tasks/svg.js')
-const serve = require('./tasks/serve.js')
+const css = require('./tasks/css')
+const js = require('./tasks/js')
+const svg = require('./tasks/svg')
+const serve = require('./tasks/serve')
 
 app.command('update')
 .describe('Build the site once')

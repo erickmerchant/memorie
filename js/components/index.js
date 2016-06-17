@@ -1,7 +1,7 @@
-const row = require('./partials/row.js')
-const unfound = require('./unfound.js')
+const row = require('./partials/row')
+const unfound = require('./unfound')
 const actions = {
-  init: require('../actions/init.js')
+  init: require('../actions/init')
 }
 
 module.exports = function (state, app, main = defaultMain) {
@@ -21,7 +21,7 @@ module.exports = function (state, app, main = defaultMain) {
         <a class="white h3" href="/">Memorie</a>
       </div>
       <div class="flex-auto center">
-        ${fetchCount()}
+        ${fetchingCount()}
       </div>
       <div class="col-4 right-align">
         <a class="white" href="/create">Add</a>
@@ -31,7 +31,7 @@ module.exports = function (state, app, main = defaultMain) {
     ${main(state, app)}
   </div>`
 
-  function fetchCount () {
+  function fetchingCount () {
     if (state.fetchingCount > 0) {
       return hx`<img src="/loading.svg" style="height: 20px">`
     }

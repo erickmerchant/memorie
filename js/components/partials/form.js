@@ -1,8 +1,8 @@
 const scrollIntoView = require('scroll-into-view')
 const actions = {
-  createTask: require('../../actions/create-task.js'),
-  editTask: require('../../actions/edit-task.js'),
-  removeTask: require('../../actions/remove-task.js')
+  createTask: require('../../actions/create-task'),
+  editTask: require('../../actions/edit-task'),
+  removeTask: require('../../actions/remove-task')
 }
 
 module.exports = function (task, app) {

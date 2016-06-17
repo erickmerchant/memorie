@@ -11,12 +11,12 @@ module.exports = function () {
       .catch(function (error) {
         dispatch({type: 'ADD_ERROR', error})
       })
-    }
 
-    setTimeout(function () {
-      promise.then(function () {
-        dispatch({type: 'SET_IS_LOADING_FALSE'})
-      })
-    }, 500)
+      setTimeout(function () {
+        promise.then(function () {
+          dispatch({type: 'SET_IS_LOADING_FALSE'})
+        })
+      }, 500)
+    }
   }
 }

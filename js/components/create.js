@@ -1,6 +1,6 @@
-const index = require('./index.js')
-const form = require('./partials/form.js')
-const row = require('./partials/row.js')
+const index = require('./index')
+const form = require('./partials/form')
+const row = require('./partials/row')
 
 module.exports = function (state, app) {
   return index(state, app, main)
