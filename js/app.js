@@ -1,4 +1,4 @@
-const framework = require('./framework')
+const framework = require('@erickmerchant/framework')
 const reducers = {
   errors: require('./reducers/errors'),
   fetchingCount: require('./reducers/fetching-count'),
