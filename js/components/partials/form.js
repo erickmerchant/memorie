@@ -22,8 +22,10 @@ module.exports = function (task, app) {
       <label class="block my2">
         <input class="p1 input" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
       </label>
-      <div class="inline-block mr1 mb1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></div>
-      ${task ? hx`<div class="inline-block mr1 mb1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove(task.id)}>Delete</button></div>` : ''}
+      <div class="mb1 right-align">
+        <button class="btn btn-primary bg-maroon" type="submit">Save</button>
+        ${task ? hx`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove(task.id)}>Delete</button>` : ''}
+      </div>
     </div>
   </form>`
 
