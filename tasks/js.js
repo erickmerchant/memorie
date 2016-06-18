@@ -3,7 +3,6 @@
 const fs = require('fs')
 const chokidar = require('chokidar')
 const browserify = require('browserify')
-const streamToPromise = require('stream-to-promise')
 
 function js (debug) {
   var bundleFs = fs.createWriteStream('static/app.js')
@@ -21,7 +20,10 @@ function js (debug) {
   bundle.transform({ global: true }, 'uglifyify')
   bundle.bundle().pipe(bundleFs)
 
-  return streamToPromise(bundle)
+  return new Promise(function (resolve, reject) {
+    bundleFs.once('finish', resolve)
+    bundleFs.once('error', reject)
+  })
 }
 
 js.watch = function () {
