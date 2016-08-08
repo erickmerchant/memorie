@@ -16,7 +16,7 @@ module.exports = function () {
         promise.then(function () {
           dispatch({type: 'SET_IS_LOADING_FALSE'})
         })
-      }, 500)
+      }, 100)
     }
   }
 }

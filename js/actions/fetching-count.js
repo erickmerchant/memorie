@@ -10,6 +10,6 @@ module.exports = function (promise) {
       promise.then(function () {
         dispatch({type: 'DECREMENT_FETCHING_COUNT'})
       })
-    }, 500)
+    }, 100)
   }
 }
