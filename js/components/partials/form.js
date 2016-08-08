@@ -15,49 +15,43 @@ module.exports = function (task, {dispatch, next, show, hx}) {
     input.focus()
   })
 
-  return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? edit(task.id) : create()}>
+  return hx`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? edit : create}>
     <div class="black pb2 max-width-2 mx-auto">
       <label class="block my2">
         <input class="p1 input" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
       </label>
       <div class="mb1 right-align">
         <button class="btn btn-primary bg-maroon" type="submit">Save</button>
-        ${task ? hx`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove(task.id)}>Delete</button>` : ''}
+        ${task ? hx`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button>` : ''}
       </div>
     </div>
   </form>`
 
-  function create () {
-    return function (e) {
-      e.preventDefault()
+  function create (e) {
+    e.preventDefault()
 
-      show('/')
+    show('/')
 
-      var title = this.title.value
+    var title = this.title.value
 
-      dispatch(actions.createTask(title))
-    }
+    dispatch(actions.createTask(title))
   }
 
-  function edit (id) {
-    return function (e) {
-      e.preventDefault()
+  function edit (e) {
+    e.preventDefault()
 
-      show('/')
+    show('/')
 
-      var title = this.title.value
+    var title = this.title.value
 
-      dispatch(actions.editTask(id, title))
-    }
+    dispatch(actions.editTask(task.id, title))
   }
 
-  function remove (id) {
-    return function (e) {
-      e.preventDefault()
+  function remove (e) {
+    e.preventDefault()
 
-      show('/')
+    show('/')
 
-      dispatch(actions.removeTask(id))
-    }
+    dispatch(actions.removeTask(task.id))
   }
 }
