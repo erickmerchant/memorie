@@ -1,22 +1,20 @@
 const fetch = require('simple-fetch')
 var promise
 
-module.exports = function () {
-  return function (dispatch) {
-    if (promise == null) {
-      promise = fetch.getJson('/api/tasks')
-      .then(function (tasks) {
-        dispatch({type: 'POPULATE_TASKS', tasks})
-      })
-      .catch(function (error) {
-        dispatch({type: 'ADD_ERROR', error})
-      })
+module.exports = function ({dispatch}) {
+  if (promise == null) {
+    promise = fetch.getJson('/api/tasks')
+    .then(function (tasks) {
+      dispatch('tasks', 'populate', tasks)
+    })
+    .catch(function (error) {
+      dispatch('errors', 'add', error)
+    })
 
-      setTimeout(function () {
-        promise.then(function () {
-          dispatch({type: 'SET_IS_LOADING_FALSE'})
-        })
-      }, 100)
-    }
+    setTimeout(function () {
+      promise.then(function () {
+        dispatch('isLoading', 'disable')
+      })
+    }, 500)
   }
 }

@@ -1,15 +1,13 @@
-module.exports = function (promise) {
-  return function (dispatch) {
-    promise.catch(function (error) {
-      dispatch({type: 'ADD_ERROR', error})
+module.exports = function ({dispatch}, promise) {
+  promise.catch(function (error) {
+    dispatch('errors', 'add', error)
+  })
+
+  dispatch('fetchingCount', 'increment')
+
+  setTimeout(function () {
+    promise.then(function () {
+      dispatch('fetchingCount', 'decrement')
     })
-
-    dispatch({type: 'INCREMENT_FETCHING_COUNT'})
-
-    setTimeout(function () {
-      promise.then(function () {
-        dispatch({type: 'DECREMENT_FETCHING_COUNT'})
-      })
-    }, 100)
-  }
+  }, 500)
 }

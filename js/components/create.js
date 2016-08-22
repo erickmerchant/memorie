@@ -1,14 +1,14 @@
 const index = require('./index')
-const form = require('./partials/form')
-const row = require('./partials/row')
+const form = require('./form')
+const row = require('./row')
 
-module.exports = function (state, app) {
-  return index(state, app, main)
+module.exports = function (app) {
+  return index(app, main)
 
-  function main (state, app) {
+  function main ({state}) {
     return [
-      form(null, app),
-      state.tasks.map((task) => row(task, app))
+      form(app),
+      state.tasks.map((task) => row(app, task))
     ]
   }
 }

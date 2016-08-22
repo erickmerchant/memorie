@@ -1,21 +1,19 @@
-const row = require('./partials/row')
+const row = require('./row')
 const unfound = require('./unfound')
-const actions = {
-  init: require('../actions/init')
-}
+const initAction = require('../actions/init')
 
-module.exports = function (state, app, main = defaultMain) {
-  var {dispatch, next, hx} = app
+module.exports = function (app, main = defaultMain) {
+  var {state, dispatch, next, html} = app
 
   if (state.isLoading) {
     next(function () {
-      dispatch(actions.init())
+      initAction({dispatch})
     })
 
-    return unfound(state, app)
+    return unfound(app)
   }
 
-  return hx`<div>
+  return html`<main>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
         <a class="white h3" href="/">Memorie</a>
@@ -28,22 +26,22 @@ module.exports = function (state, app, main = defaultMain) {
       </div>
     </div>
     ${state.errors.map(alert)}
-    ${main(state, app)}
-  </div>`
+    ${main(app)}
+  </main>`
 
   function fetchingCount () {
     if (state.fetchingCount > 0) {
-      return hx`<img src="/loading.svg" style="height: 20px">`
+      return html`<img src="/loading.svg" style="height: 20px">`
     }
   }
 
   function alert (error) {
-    return hx`<div class="block m1 p2 bg-fuchsia white">${error.message}</div>`
+    return html`<div class="block m1 p2 bg-fuchsia white">${error.message}</div>`
   }
 }
 
-function defaultMain (state, app) {
-  var {hx} = app
+function defaultMain (app) {
+  var {state, html} = app
 
-  return hx`${state.tasks.map((task) => row(task, app))}`
+  return html`${state.tasks.map((task) => row(app, task))}`
 }

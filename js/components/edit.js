@@ -1,17 +1,17 @@
 const index = require('./index')
-const form = require('./partials/form')
-const row = require('./partials/row')
+const form = require('./form')
+const row = require('./row')
 
-module.exports = function (state, app) {
-  return index(state, app, main)
+module.exports = function (app) {
+  return index(app, main)
 
-  function main (state, app) {
+  function main ({state, context}) {
     return state.tasks.map((task) => {
-      if (task.id === parseInt(state.context.params.id)) {
-        return form(task, app)
+      if (task.id === parseInt(context.params.id)) {
+        return form(app, task)
       }
 
-      return row(task, app)
+      return row(app, task)
     })
   }
 }

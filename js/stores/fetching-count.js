@@ -1,9 +1,9 @@
 module.exports = function (state = 0, action) {
-  if (action.type === 'INCREMENT_FETCHING_COUNT') {
+  if (action === 'increment') {
     return state + 1
   }
 
-  if (action.type === 'DECREMENT_FETCHING_COUNT') {
+  if (action === 'decrement') {
     return state - 1
   }
 
