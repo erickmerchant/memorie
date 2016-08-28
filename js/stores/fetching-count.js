@@ -1,10 +1,10 @@
 module.exports = function (state = 0, action) {
   if (action === 'increment') {
-    return state + 1
+    state++
   }
 
   if (action === 'decrement') {
-    return state - 1
+    state--
   }
 
   return state

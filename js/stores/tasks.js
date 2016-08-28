@@ -1,6 +1,6 @@
 module.exports = function (state = [], action, data) {
   if (action === 'populate') {
-    return data
+    state = data
   }
 
   if (action === 'create') {
@@ -8,19 +8,11 @@ module.exports = function (state = [], action, data) {
   }
 
   if (action === 'save') {
-    state = state.map(function (task) {
-      if (task.id === data.id) {
-        return data
-      }
-
-      return task
-    })
+    state = state.map((task) => (task.id === data.id) ? data : task)
   }
 
   if (action === 'remove') {
-    state = state.filter(function (task) {
-      return task.id !== data
-    })
+    state = state.filter((task) => task.id !== data)
   }
 
   return state
