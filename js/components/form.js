@@ -20,7 +20,7 @@ module.exports = function ({dispatch, next, show, html}, task) {
       </label>
       <div class="mb1 right-align">
         <button class="btn btn-primary bg-maroon" type="submit">Save</button>
-        ${task ? html`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button>` : ''}
+        ${task ? html`&nbsp;<button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button>` : ''}
       </div>
     </div>
   </form>`

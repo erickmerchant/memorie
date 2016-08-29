@@ -5,10 +5,10 @@ const row = require('./row')
 module.exports = function (app) {
   return index(app, main)
 
-  function main ({state}) {
+  function main ({html, state}) {
     return [
-      form(app),
-      state.tasks.map((task) => row(app, task))
+      html`<div id="new">${form(app)}</div>`,
+      ...state.tasks.map((task) => row(app, task))
     ]
   }
 }

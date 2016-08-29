@@ -9,7 +9,7 @@
   "author": "Erick Merchant <erick.merchant@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@erickmerchant/framework": "^3.0.0",
+    "@erickmerchant/framework": "^4.0.0",
     "@erickmerchant/router": "^6.0.0",
     "@erickmerchant/state-container": "^1.0.2",
     "autoprefixer": "^6.3.6",

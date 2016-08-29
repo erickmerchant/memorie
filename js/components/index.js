@@ -13,7 +13,7 @@ module.exports = function (app, main = defaultMain) {
     return unfound(app)
   }
 
-  return html`<main>
+  return html`<div>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
         <a class="white h3" href="/">Memorie</a>
@@ -27,7 +27,7 @@ module.exports = function (app, main = defaultMain) {
     </div>
     ${state.errors.map(alert)}
     ${main(app)}
-  </main>`
+  </div>`
 
   function fetchingCount () {
     if (state.fetchingCount > 0) {
