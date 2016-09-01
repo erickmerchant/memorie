@@ -11,6 +11,8 @@ module.exports = function ({dispatch, next, show, html}, task) {
     scrollIntoView(form)
 
     input.focus()
+
+    input.value = input.value
   })
 
   return html`<form class="left-align col col-12 bg-silver p2" onsubmit=${task ? save : create}>
