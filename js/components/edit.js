@@ -5,9 +5,9 @@ const row = require('./row')
 module.exports = function (app) {
   return index(app, main)
 
-  function main ({state, params}) {
+  function main ({state, context}) {
     return state.tasks.map((task) => {
-      if (task.id === parseInt(params.id)) {
+      if (task.id === parseInt(context.params.id)) {
         return form(app, task)
       }
 

@@ -1,16 +1,13 @@
 const row = require('./row')
-const unfound = require('./unfound')
 const initAction = require('../actions/init')
 
 module.exports = function (app, main = defaultMain) {
   var {state, dispatch, next, html} = app
 
-  if (state.isLoading) {
+  if (!state.tasks.length) {
     next(function () {
       initAction({dispatch})
     })
-
-    return unfound(app)
   }
 
   return html`<div>

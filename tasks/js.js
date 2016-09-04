@@ -3,10 +3,15 @@
 const fs = require('fs')
 const chokidar = require('chokidar')
 const browserify = require('browserify')
+const exorcist = require('exorcist')
+const collapser = require('bundle-collapser/plugin')
 
 function js (debug) {
   var bundleFs = fs.createWriteStream('static/app.js')
-  var options = {}
+  var mapFile = 'static/app.map'
+  var options = {
+    plugin: [collapser]
+  }
 
   if (debug) {
     options.debug = true
@@ -17,8 +22,11 @@ function js (debug) {
   bundle.add('js/app.js')
   // bundle.transform('hyperxify')
   bundle.transform('babelify', { presets: [ 'es2015' ] })
-  bundle.transform({ global: true }, 'uglifyify')
-  bundle.bundle().pipe(bundleFs)
+  bundle.transform({ global: true, mangle: true, compress: true }, 'uglifyify')
+  bundle
+  .bundle()
+  .pipe(exorcist(mapFile))
+  .pipe(bundleFs)
 
   return new Promise(function (resolve, reject) {
     bundleFs.once('finish', resolve)

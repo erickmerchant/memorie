@@ -136,6 +136,10 @@ pg.connect(databaseURL, function (err, client) {
     res.json({error: err.message})
   })
 
+  app.use('/error', function (req, res, next) {
+    res.render('error')
+  })
+
   app.use('*', function (req, res, next) {
     res.render('index')
   })

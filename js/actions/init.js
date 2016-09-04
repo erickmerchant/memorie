@@ -1,5 +1,6 @@
 const fetch = require('simple-fetch')
-var promise
+const fetchingCount = require('./fetching-count')
+let promise
 
 module.exports = function ({dispatch}) {
   if (promise == null) {
@@ -11,10 +12,6 @@ module.exports = function ({dispatch}) {
       dispatch('errors', 'add', error)
     })
 
-    setTimeout(function () {
-      promise.then(function () {
-        dispatch('isLoading', 'disable')
-      })
-    }, 500)
+    fetchingCount({dispatch}, promise)
   }
 }

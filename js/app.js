@@ -5,7 +5,6 @@ const stateContainer = require('@erickmerchant/state-container')
 const store = stateContainer(function (store) {
   store('errors', require('./stores/errors'))
   store('fetchingCount', require('./stores/fetching-count'))
-  store('isLoading', require('./stores/is-loading'))
   store('tasks', require('./stores/tasks'))
 })
 
