@@ -1,8 +1,10 @@
 const row = require('./row')
 const initAction = require('../actions/init')
+const diff = require('diffhtml')
+const html = diff.html
 
 module.exports = function (app, main = defaultMain) {
-  var {state, dispatch, next, html} = app
+  var {state, dispatch, next} = app
 
   if (!state.tasks.length) {
     next(function () {
@@ -30,6 +32,8 @@ module.exports = function (app, main = defaultMain) {
     if (state.fetchingCount > 0) {
       return html`<img src="/loading.svg" style="height: 20px">`
     }
+
+    return ''
   }
 
   function alert (error) {

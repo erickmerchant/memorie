@@ -27,6 +27,7 @@
     "bundle-collapser": "^1.2.1",
     "chokidar": "^1.4.3",
     "cssnano": "^3.5.2",
+    "diffhtml": "^0.9.2",
     "exorcist": "^0.4.0",
     "fs-extra": "^0.30.0",
     "hyperxify": "^2.0.1",
@@ -43,6 +44,7 @@
     "simple-fetch": "^1.2.1",
     "standard": "^8.0.0",
     "thenify": "^3.2.0",
+    "transform-tagged-diffhtml": "^1.0.0-rc.4",
     "uglifyify": "^3.0.1"
   },
   "dependencies": {

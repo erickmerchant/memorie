@@ -2,8 +2,10 @@ const scrollIntoView = require('scroll-into-view')
 const createTaskAction = require('../actions/create-task')
 const saveTaskAction = require('../actions/save-task')
 const removeTaskAction = require('../actions/remove-task')
+const diff = require('diffhtml')
+const html = diff.html
 
-module.exports = function ({dispatch, next, show, html}, task) {
+module.exports = function ({dispatch, next, show}, task) {
   next(function (element) {
     var form = element.querySelector('form')
     var input = element.querySelector('input')
@@ -22,7 +24,8 @@ module.exports = function ({dispatch, next, show, html}, task) {
       </label>
       <div class="mb1 right-align">
         <button class="btn btn-primary bg-maroon" type="submit">Save</button>
-        ${task ? html`&nbsp;<button class="btn btn-primary bg-fuchsia" type="button" onclick=${preventDefault(remove)}>Delete</button>` : ''}
+        <span> </span>
+        ${task ? html`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${preventDefault(remove)}>Delete</button>` : ''}
       </div>
     </div>
   </form>`
