@@ -6,7 +6,7 @@ const html = diff.html
 module.exports = function (app, main = defaultMain) {
   var {state, dispatch, next} = app
 
-  if (!state.tasks.length) {
+  if (!state.tasks.size()) {
     next(function () {
       initAction({dispatch})
     })

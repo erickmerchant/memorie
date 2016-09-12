@@ -6,7 +6,7 @@ module.exports = function ({dispatch, show}, title) {
 
   var promise = fetch.postJson('/api/tasks', {title})
   .then(function (task) {
-    dispatch('tasks', 'create', {id: task.id, title})
+    dispatch('tasks', 'save', {id: task.id, title})
   })
 
   fetchingCount({dispatch}, promise)

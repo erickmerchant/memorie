@@ -6,7 +6,7 @@ module.exports = function ({dispatch, show}, id) {
 
   var promise = fetch.deleteJson('/api/tasks/' + id)
   .then(function () {
-    dispatch('tasks', 'remove', id)
+    dispatch('tasks', 'remove', {id})
   })
 
   fetchingCount({dispatch}, promise)

@@ -1,18 +1,16 @@
-module.exports = function (state = [], action, data) {
-  if (action === 'populate') {
-    state = data
-  }
+const List = require('../types/list.js')
 
-  if (action === 'create') {
-    state.unshift(data)
+module.exports = function (state = new List(), action, data) {
+  if (action === 'populate') {
+    state.initialize(data.map((d) => [d.id, d]))
   }
 
   if (action === 'save') {
-    state = state.map((task) => (task.id === data.id) ? data : task)
+    state.set(data.id, data)
   }
 
   if (action === 'remove') {
-    state = state.filter((task) => task.id !== data)
+    state.delete(data.id)
   }
 
   return state
