@@ -1,5 +1,6 @@
 const row = require('./row')
 const initAction = require('../actions/init')
+const removeErrorAction = require('../actions/remove-error')
 const diff = require('diffhtml')
 const html = diff.html
 
@@ -37,7 +38,13 @@ module.exports = function (app, main = defaultMain) {
   }
 
   function alert (error) {
-    return html`<div class="block m1 p2 bg-fuchsia white">${error.message}</div>`
+    return html`<div class="clearfix flex items-center m1 p2 bg-fuchsia white"><div class="col col-11">${error.message}</div><div class="col col-1 center"><button class="btn" onclick=${removeError(error)}>x</button></div></div>`
+  }
+
+  function removeError (error) {
+    return function () {
+      removeErrorAction({dispatch}, error)
+    }
   }
 }
 

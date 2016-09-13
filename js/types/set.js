@@ -1,18 +1,14 @@
 module.exports = class {
   constructor (data = []) {
-    this.list = new Map()
+    this.list = new Set([...data])
   }
 
-  initialize (data) {
-    this.list = new Map([...data.reverse()])
+  set (data) {
+    this.list.add(data)
   }
 
-  set (id, data) {
-    this.list.set(id, data)
-  }
-
-  delete (id) {
-    this.list.delete(id)
+  delete (data) {
+    this.list.delete(data)
   }
 
   size () {

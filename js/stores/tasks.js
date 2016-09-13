@@ -1,8 +1,8 @@
-const List = require('../types/list.js')
+const Map = require('../types/map.js')
 
-module.exports = function (state = new List(), action, data) {
+module.exports = function (state = new Map(), action, data) {
   if (action === 'populate') {
-    state.initialize(data.map((d) => [d.id, d]))
+    state = new Map(data.map((d) => [d.id, d]))
   }
 
   if (action === 'save') {

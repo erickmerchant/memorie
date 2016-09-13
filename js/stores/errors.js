@@ -1,6 +1,12 @@
-module.exports = function (state = [], action, data) {
+const Set = require('../types/set.js')
+
+module.exports = function (state = new Set(), action, data) {
   if (action === 'add') {
-    state.push(data)
+    state.set(data)
+  }
+
+  if (action === 'remove') {
+    state.delete(data)
   }
 
   return state
