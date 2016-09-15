@@ -19,6 +19,7 @@ function js (debug) {
 
   var bundle = browserify(options)
 
+  bundle.require('whatwg-fetch')
   bundle.add('js/app.js')
   bundle.transform('babelify', { presets: [ 'es2015' ], plugins: ['transform-tagged-diffhtml'] })
   bundle.transform({ global: true, mangle: true, compress: true }, 'uglifyify')

@@ -1,5 +1,3 @@
-const Map = require('../types/map.js')
-
 module.exports = function (state = new Map(), action, data) {
   if (action === 'populate') {
     state = new Map(data.map((d) => [d.id, d]))

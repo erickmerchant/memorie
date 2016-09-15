@@ -2,6 +2,7 @@ const scrollIntoView = require('scroll-into-view')
 const createTaskAction = require('../actions/create-task')
 const saveTaskAction = require('../actions/save-task')
 const removeTaskAction = require('../actions/remove-task')
+const preventDefault = require('prevent-default')
 const diff = require('diffhtml')
 const html = diff.html
 
@@ -25,7 +26,7 @@ module.exports = function ({dispatch, next, show}, task) {
       <div class="mb1 right-align">
         <button class="btn btn-primary bg-maroon" type="submit">Save</button>
         <span> </span>
-        ${task ? html`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${preventDefault(remove)}>Delete</button>` : ''}
+        ${task ? html`<button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button>` : ''}
       </div>
     </div>
   </form>`
@@ -44,13 +45,5 @@ module.exports = function ({dispatch, next, show}, task) {
 
   function remove (e) {
     removeTaskAction({dispatch, show}, task.id)
-  }
-
-  function preventDefault (func) {
-    return function (e) {
-      e.preventDefault()
-
-      func.call(this, e)
-    }
   }
 }

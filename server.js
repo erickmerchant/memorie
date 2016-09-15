@@ -50,12 +50,16 @@ pg.connect(databaseURL, function (err, client) {
       if (err) {
         next(err)
       } else {
+        res.status(200)
+
         res.json(result.rows)
       }
     })
   })
 
   app.post('/api/tasks', function (req, res, next) {
+    console.log(res.body)
+
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
     assert.string(req.body.title, 'Title must be a string')
 
@@ -69,7 +73,7 @@ pg.connect(databaseURL, function (err, client) {
       } else {
         res.status(201)
 
-        res.json(result.rows[0])
+        res.json(result.rows[0].id)
       }
     })
   })
@@ -86,9 +90,7 @@ pg.connect(databaseURL, function (err, client) {
       if (err) {
         next(err)
       } else {
-        res.status(200)
-
-        res.json({id: parseInt(req.params.id)})
+        res.status(200).end()
       }
     })
   })
@@ -102,9 +104,7 @@ pg.connect(databaseURL, function (err, client) {
       if (err) {
         next(err)
       } else {
-        res.status(200)
-
-        res.json({id: parseInt(req.params.id)})
+        res.status(200).end()
       }
     })
   })

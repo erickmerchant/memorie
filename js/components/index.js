@@ -1,4 +1,4 @@
-const row = require('./row')
+const rows = require('./rows')
 const initAction = require('../actions/init')
 const removeErrorAction = require('../actions/remove-error')
 const diff = require('diffhtml')
@@ -7,7 +7,7 @@ const html = diff.html
 module.exports = function (app, main = defaultMain) {
   var {state, dispatch, next} = app
 
-  if (!state.tasks.size()) {
+  if (!state.tasks.size) {
     next(function () {
       initAction({dispatch})
     })
@@ -25,7 +25,7 @@ module.exports = function (app, main = defaultMain) {
         <a class="white" href="/create">Add</a>
       </div>
     </div>
-    ${state.errors.map(alert)}
+    ${errors()}
     ${main(app)}
   </div>`
 
@@ -37,8 +37,8 @@ module.exports = function (app, main = defaultMain) {
     return ''
   }
 
-  function alert (error) {
-    return html`<div class="clearfix flex items-center m1 p2 bg-fuchsia white"><div class="col col-11">${error.message}</div><div class="col col-1 center"><button class="btn" onclick=${removeError(error)}>x</button></div></div>`
+  function errors () {
+    return [...state.errors].reverse().map((error) => html`<div class="clearfix flex items-center m1 p2 bg-fuchsia white"><div class="col col-11">${error.message}</div><div class="col col-1 center"><button class="btn" onclick=${removeError(error)}>x</button></div></div>`)
   }
 
   function removeError (error) {
@@ -49,7 +49,5 @@ module.exports = function (app, main = defaultMain) {
 }
 
 function defaultMain (app) {
-  var {state, html} = app
-
-  return html`${state.tasks.map((task) => row(app, task))}`
+  return rows(app)
 }
