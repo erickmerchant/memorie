@@ -58,8 +58,6 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.post('/api/tasks', function (req, res, next) {
-    console.log(res.body)
-
     assert.ok(typeof req.body.title !== 'undefined', 'Title is required')
     assert.string(req.body.title, 'Title must be a string')
 
@@ -105,18 +103,6 @@ pg.connect(databaseURL, function (err, client) {
         next(err)
       } else {
         res.status(200).end()
-      }
-    })
-  })
-
-  app.get('/api/tasks/:id', function (req, res, next) {
-    client.query('SELECT * FROM task WHERE id = $1', [req.params.id], function (err, result) {
-      if (err) {
-        next(err)
-      } else {
-        res.status(200)
-
-        res.json(result.rows[0])
       }
     })
   })

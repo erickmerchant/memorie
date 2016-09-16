@@ -1,8 +1,9 @@
 const scrollIntoView = require('scroll-into-view')
-const createTaskAction = require('../actions/create-task')
-const saveTaskAction = require('../actions/save-task')
-const removeTaskAction = require('../actions/remove-task')
 const preventDefault = require('prevent-default')
+const tasksActions = require('../actions/tasks')
+const createTaskAction = tasksActions.create
+const saveTaskAction = tasksActions.save
+const removeTaskAction = tasksActions.remove
 const diff = require('diffhtml')
 const html = diff.html
 

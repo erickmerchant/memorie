@@ -1,5 +1,5 @@
 const rows = require('./rows')
-const initAction = require('../actions/init')
+const initTasksAction = require('../actions/tasks').init
 const removeErrorAction = require('../actions/remove-error')
 const diff = require('diffhtml')
 const html = diff.html
@@ -9,7 +9,7 @@ module.exports = function (app, main = defaultMain) {
 
   if (!state.tasks.size) {
     next(function () {
-      initAction({dispatch})
+      initTasksAction({dispatch})
     })
   }
 
