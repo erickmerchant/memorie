@@ -31,7 +31,6 @@
     "exorcist": "^0.4.0",
     "fs-extra": "^0.30.0",
     "hyperxify": "^2.0.1",
-    "loading-svg": "^1.0.0",
     "lodash.trim": "^4.2.0",
     "nodemon": "^1.8.1",
     "postcss": "^5.0.19",

@@ -22,7 +22,7 @@ module.exports = {
   create ({dispatch, show}, title) {
     show('/')
 
-    var promise = fetch('/api/tasks', options({
+    const promise = fetch('/api/tasks', options({
       method: 'post',
       body: JSON.stringify({title})
     }))
@@ -38,7 +38,7 @@ module.exports = {
   save ({dispatch, show}, id, title) {
     show('/')
 
-    var promise = fetch('/api/tasks/' + id, options({
+    const promise = fetch('/api/tasks/' + id, options({
       method: 'put',
       body: JSON.stringify({title})
     }))
@@ -53,7 +53,7 @@ module.exports = {
   remove ({dispatch, show}, id) {
     show('/')
 
-    var promise = fetch('/api/tasks/' + id, options({method: 'delete'}))
+    const promise = fetch('/api/tasks/' + id, options({method: 'delete'}))
     .then(response)
     .then(function () {
       dispatch('tasks', 'remove', {id})
@@ -79,7 +79,7 @@ function response (res) {
   if (!res.ok) {
     return res.json().then(function (err) {
       if (err.error) {
-        return Promise.reject(new Error(err.error))
+        throw new Error(err.error)
       }
 
       throw new Error('Network error')
@@ -90,7 +90,7 @@ function response (res) {
 }
 
 function wrap ({dispatch}, promise) {
-  promise.catch(function (error) {
+  promise = promise.catch(function (error) {
     dispatch('errors', 'add', error)
   })
 

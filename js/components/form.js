@@ -9,8 +9,8 @@ const html = diff.html
 
 module.exports = function ({dispatch, next, show}, task) {
   next(function (element) {
-    var form = element.querySelector('form')
-    var input = element.querySelector('input')
+    const form = element.querySelector('form')
+    const input = element.querySelector('input')
 
     scrollIntoView(form)
 
@@ -33,13 +33,13 @@ module.exports = function ({dispatch, next, show}, task) {
   </form>`
 
   function create (e) {
-    var title = this.title.value
+    const title = this.title.value
 
     createTaskAction({dispatch, show}, title)
   }
 
   function save (e) {
-    var title = this.title.value
+    const title = this.title.value
 
     saveTaskAction({dispatch, show}, task.id, title)
   }

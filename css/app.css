@@ -19,3 +19,11 @@ a {
   font-family: inherit;
   font-size: inherit;
 }
+
+.rotate-500ms-linear-infinite {
+  animation: rotate 500ms linear infinite;
+}
+
+@keyframes rotate {
+  to { transform: rotate(360deg); }
+}

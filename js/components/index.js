@@ -1,11 +1,12 @@
 const rows = require('./rows')
+const spinner = require('./spinner')
 const initTasksAction = require('../actions/tasks').init
 const removeErrorAction = require('../actions/remove-error')
 const diff = require('diffhtml')
 const html = diff.html
 
 module.exports = function (app, main = defaultMain) {
-  var {state, dispatch, next} = app
+  const {state, dispatch, next} = app
 
   if (!state.tasks.size) {
     next(function () {
@@ -18,7 +19,7 @@ module.exports = function (app, main = defaultMain) {
       <div class="col-4 left-align">
         <a class="white h3" href="/">Memorie</a>
       </div>
-      <div class="flex-auto center">
+      <div class="flex-auto justify-center items-center flex">
         ${fetchingCount()}
       </div>
       <div class="col-4 right-align">
@@ -31,7 +32,7 @@ module.exports = function (app, main = defaultMain) {
 
   function fetchingCount () {
     if (state.fetchingCount > 0) {
-      return html`<img src="/loading.svg" style="height: 20px">`
+      return spinner({html}, 20)
     }
 
     return ''
