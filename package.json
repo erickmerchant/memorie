@@ -38,6 +38,7 @@
     "postcss-custom-media": "^5.0.1",
     "postcss-custom-properties": "^5.0.0",
     "postcss-import": "^8.1.0",
+    "postcss-inherit": "^4.0.1",
     "prevent-default": "0.0.3",
     "scroll-into-view": "^1.6.0",
     "sergeant": "^12.2.0",
