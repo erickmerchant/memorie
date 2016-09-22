@@ -4,13 +4,15 @@ const rows = require('./rows')
 const diff = require('diffhtml')
 const html = diff.html
 
-module.exports = function (app) {
-  return index(app, main)
+module.exports = function () {
+  return function (app) {
+    return index()(app, main)
 
-  function main ({state}) {
-    return html`${[
-      html`<div id="new">${form(app)}</div>`,
-      rows(app)
-    ]}`
+    function main ({state}) {
+      return html`${[
+        html`<div id="new">${form(app)}</div>`,
+        rows(app)
+      ]}`
+    }
   }
 }
