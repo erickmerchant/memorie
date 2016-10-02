@@ -1,103 +1,75 @@
 /* global fetch */
 
-let initPromise
+const once = require('once')
 
 module.exports = {
-  init ({dispatch}) {
-    if (initPromise == null) {
-      initPromise = fetch('/api/tasks')
-      .then(response)
-      .then(json)
-      .then(function (tasks) {
-        dispatch('tasks', 'populate', tasks)
-      })
-      .catch(function (error) {
-        dispatch('errors', 'add', error)
-      })
-
-      wrap({dispatch}, initPromise)
-    }
-  },
+  init: once(function ({dispatch}) {
+    request(dispatch, '/api/tasks', {}, (tasks) => {
+      dispatch('tasks', 'populate', tasks)
+    })
+  }),
 
   create ({dispatch, show}, title) {
     show('/')
 
-    const promise = fetch('/api/tasks', options({
+    request(dispatch, '/api/tasks', {
       method: 'post',
       body: JSON.stringify({title})
-    }))
-    .then(response)
-    .then(json)
-    .then(function (id) {
+    }, (id) => {
       dispatch('tasks', 'save', {id, title})
     })
-
-    wrap({dispatch}, promise)
   },
 
   save ({dispatch, show}, id, title) {
     show('/')
 
-    const promise = fetch('/api/tasks/' + id, options({
+    request(dispatch, '/api/tasks/' + id, {
       method: 'put',
       body: JSON.stringify({title})
-    }))
-    .then(response)
-    .then(function () {
+    }, () => {
       dispatch('tasks', 'save', {id, title})
     })
-
-    wrap({dispatch}, promise)
   },
 
   remove ({dispatch, show}, id) {
     show('/')
 
-    const promise = fetch('/api/tasks/' + id, options({method: 'delete'}))
-    .then(response)
-    .then(function () {
+    request(dispatch, '/api/tasks/' + id, {method: 'delete'}, () => {
       dispatch('tasks', 'remove', {id})
     })
-
-    wrap({dispatch}, promise)
   }
 }
 
-function options (options) {
-  return Object.assign({}, {
+function request (dispatch, url, options, callback) {
+  let promise = fetch(url, Object.assign({}, {
     headers: {
       'Content-Type': 'application/json'
     }
-  }, options)
-}
+  }, options))
+  .then((res) => {
+    if (!res.ok) {
+      return res.json().then((err) => {
+        if (err.error) {
+          throw new Error(err.error)
+        }
 
-function json (res) {
-  return res.json()
-}
+        throw new Error('Network error')
+      })
+    }
 
-function response (res) {
-  if (!res.ok) {
-    return res.json().then(function (err) {
-      if (err.error) {
-        throw new Error(err.error)
-      }
+    return res
+  })
+  .then((res) => res.json().then(json => json).catch(() => null))
+  .then(callback)
 
-      throw new Error('Network error')
-    })
-  }
-
-  return res
-}
-
-function wrap ({dispatch}, promise) {
-  promise = promise.catch(function (error) {
+  promise = promise.catch((error) => {
     dispatch('errors', 'add', error)
   })
 
   dispatch('fetchingCount', 'increment')
 
-  setTimeout(function () {
-    promise.then(function () {
+  setTimeout(() => {
+    promise.then(() => {
       dispatch('fetchingCount', 'decrement')
     })
   }, 500)

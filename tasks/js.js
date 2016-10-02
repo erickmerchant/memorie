@@ -3,30 +3,24 @@
 const fs = require('fs')
 const chokidar = require('chokidar')
 const browserify = require('browserify')
-const exorcist = require('exorcist')
+const minifyify = require('minifyify')
+const babelify = require('babelify')
 const collapser = require('bundle-collapser/plugin')
 
-function js (debug) {
+function js () {
   var bundleFs = fs.createWriteStream('static/app.js')
-  var mapFile = 'static/app.map'
   var options = {
+    debug: true,
     plugin: [collapser]
-  }
-
-  if (debug) {
-    options.debug = true
   }
 
   var bundle = browserify(options)
 
   bundle.require('whatwg-fetch')
   bundle.add('js/app.js')
-  bundle.transform('babelify', { presets: [ 'es2015' ], plugins: ['transform-tagged-diffhtml'] })
-  bundle.transform({ global: true, mangle: true, compress: true }, 'uglifyify')
-  bundle
-  .bundle()
-  .pipe(exorcist(mapFile))
-  .pipe(bundleFs)
+  bundle.plugin(minifyify, { map: '/app.map', output: 'static/app.map' })
+  bundle.transform(babelify, { presets: [ 'es2015' ], plugins: ['transform-tagged-diffhtml'] })
+  bundle.bundle().pipe(bundleFs)
 
   return new Promise(function (resolve, reject) {
     bundleFs.once('finish', resolve)
@@ -35,9 +29,9 @@ function js (debug) {
 }
 
 js.watch = function () {
-  return js(true).then(function () {
+  return js().then(function () {
     chokidar.watch('js/**/*.js', {ignoreInitial: true}).on('all', function () {
-      js(true).catch(console.error)
+      js().catch(console.error)
     })
 
     return true

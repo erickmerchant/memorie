@@ -9,11 +9,9 @@ module.exports = function () {
   return function (app, main = defaultMain) {
     const {state, dispatch, next} = app
 
-    if (!state.tasks.size) {
-      next(function () {
-        initTasksAction({dispatch})
-      })
-    }
+    next(function () {
+      initTasksAction({dispatch})
+    })
 
     return html`<div>
       <div class="flex items-center clearfix white bg-maroon p2 bold">
