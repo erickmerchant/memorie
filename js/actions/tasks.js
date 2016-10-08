@@ -1,76 +1,88 @@
 /* global fetch */
+let isInited = false
 
-const once = require('once')
+module.exports = function (dispatch, show) {
+  return {
+    init: function () {
+      if (!isInited) {
+        isInited = true
 
-module.exports = {
-  init: once(function ({dispatch}) {
-    request(dispatch, '/api/tasks', {}, (tasks) => {
-      dispatch('tasks', 'populate', tasks)
-    })
-  }),
+        request('/api/tasks', {}).then((tasks) => {
+          dispatch('tasks', 'populate', tasks)
+        })
+      }
+    },
 
-  create ({dispatch, show}, title) {
-    show('/')
+    create (title) {
+      show('/')
 
-    request(dispatch, '/api/tasks', {
-      method: 'post',
-      body: JSON.stringify({title})
-    }, (id) => {
-      dispatch('tasks', 'save', {id, title})
-    })
-  },
+      request('/api/tasks', {
+        method: 'post',
+        body: {title}
+      }).then((id) => {
+        dispatch('tasks', 'save', {id, title})
+      })
+    },
 
-  save ({dispatch, show}, id, title) {
-    show('/')
+    save (id, title) {
+      show('/')
 
-    request(dispatch, '/api/tasks/' + id, {
-      method: 'put',
-      body: JSON.stringify({title})
-    }, () => {
-      dispatch('tasks', 'save', {id, title})
-    })
-  },
+      request('/api/tasks/' + id, {
+        method: 'put',
+        body: {title}
+      }).then(() => {
+        dispatch('tasks', 'save', {id, title})
+      })
+    },
 
-  remove ({dispatch, show}, id) {
-    show('/')
+    remove (id) {
+      show('/')
 
-    request(dispatch, '/api/tasks/' + id, {method: 'delete'}, () => {
-      dispatch('tasks', 'remove', {id})
-    })
-  }
-}
-
-function request (dispatch, url, options, callback) {
-  let promise = fetch(url, Object.assign({}, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }, options))
-  .then((res) => {
-    if (!res.ok) {
-      return res.json().then((err) => {
-        if (err.error) {
-          throw new Error(err.error)
-        }
-
-        throw new Error('Network error')
+      request('/api/tasks/' + id, {method: 'delete'}).then(() => {
+        dispatch('tasks', 'remove', {id})
       })
     }
+  }
 
-    return res
-  })
-  .then((res) => res.json().then(json => json).catch(() => null))
-  .then(callback)
+  function request (url, options, callback) {
+    if (options.body != null) {
+      options.body = JSON.stringify(options.body)
+    }
 
-  promise = promise.catch((error) => {
-    dispatch('errors', 'add', error)
-  })
+    let promise = fetch(url, Object.assign({}, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }, options))
+    .then((res) => {
+      if (!res.ok) {
+        return res.json().then((err) => {
+          if (err.error) {
+            throw new Error(err.error)
+          }
 
-  dispatch('fetchingCount', 'increment')
+          throw new Error('Network error')
+        })
+      }
 
-  setTimeout(() => {
-    promise.then(() => {
-      dispatch('fetchingCount', 'decrement')
+      return res
     })
-  }, 500)
+    .then((res) => res.json().then(json => json).catch(() => null))
+
+    dispatch('fetchingCount', 'increment')
+
+    setTimeout(() => {
+      promise.then(() => {
+        dispatch('fetchingCount', 'decrement')
+      })
+    }, 500)
+
+    promise.catch((error) => {
+      dispatch('fetchingCount', 'decrement')
+
+      dispatch('errors', 'add', error)
+    })
+
+    return promise
+  }
 }

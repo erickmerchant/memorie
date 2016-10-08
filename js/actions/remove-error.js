@@ -1,3 +1,5 @@
-module.exports = function ({dispatch}, error) {
-  dispatch('errors', 'remove', error)
+module.exports = function (dispatch) {
+  return function (error) {
+    dispatch('errors', 'remove', error)
+  }
 }

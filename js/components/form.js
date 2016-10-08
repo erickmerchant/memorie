@@ -1,13 +1,11 @@
 const scrollIntoView = require('scroll-into-view')
 const preventDefault = require('prevent-default')
-const tasksActions = require('../actions/tasks')
-const createTaskAction = tasksActions.create
-const saveTaskAction = tasksActions.save
-const removeTaskAction = tasksActions.remove
 const diff = require('diffhtml')
 const html = diff.html
 
 module.exports = function ({dispatch, next, show}, task) {
+  const tasksActions = require('../actions/tasks')(dispatch, show)
+
   next(function (target) {
     const form = target.querySelector('form')
     const input = target.querySelector('input')
@@ -32,14 +30,14 @@ module.exports = function ({dispatch, next, show}, task) {
   </form>`
 
   function create (e) {
-    createTaskAction({dispatch, show}, this.title.value)
+    tasksActions.create(this.title.value)
   }
 
   function save (e) {
-    saveTaskAction({dispatch, show}, task.id, this.title.value)
+    tasksActions.save(task.id, this.title.value)
   }
 
   function remove (e) {
-    removeTaskAction({dispatch, show}, task.id)
+    tasksActions.remove(task.id)
   }
 }
