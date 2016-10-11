@@ -88,7 +88,9 @@ pg.connect(databaseURL, function (err, client) {
       if (err) {
         next(err)
       } else {
-        res.status(200).end()
+        res.status(200)
+
+        res.json('')
       }
     })
   })
@@ -102,7 +104,9 @@ pg.connect(databaseURL, function (err, client) {
       if (err) {
         next(err)
       } else {
-        res.status(200).end()
+        res.status(200)
+
+        res.json('')
       }
     })
   })

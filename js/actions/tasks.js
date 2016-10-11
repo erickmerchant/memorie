@@ -44,19 +44,23 @@ module.exports = function (dispatch, show) {
     }
   }
 
-  function request (url, options, callback) {
+  function request (url, options) {
     if (options.body != null) {
       options.body = JSON.stringify(options.body)
     }
 
-    let promise = fetch(url, Object.assign({}, {
+    Object.assign(options, {
       headers: {
         'Content-Type': 'application/json'
       }
-    }, options))
+    })
+
+    let promise = fetch(url, options)
     .then((res) => {
+      const json = res.json()
+
       if (!res.ok) {
-        return res.json().then((err) => {
+        return json.then((err) => {
           if (err.error) {
             throw new Error(err.error)
           }
@@ -65,9 +69,8 @@ module.exports = function (dispatch, show) {
         })
       }
 
-      return res
+      return json
     })
-    .then((res) => res.json().then(json => json).catch(() => null))
 
     dispatch('fetchingCount', 'increment')
 
