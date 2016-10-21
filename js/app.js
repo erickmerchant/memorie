@@ -19,4 +19,6 @@ const component = router(function (route) {
 
 const target = document.querySelector('main')
 
-framework({target, store, component})
+const diff = require('diffhtml').diffHTML
+
+framework({target, store, component, diff})
