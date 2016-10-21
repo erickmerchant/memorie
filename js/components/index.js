@@ -2,15 +2,21 @@ const rows = require('./rows')
 const spinner = require('./spinner')
 const diff = require('diffhtml')
 const html = diff.html
+let isInited = false
 
 module.exports = function () {
   return function (app, main = defaultMain) {
     const {state, dispatch, next} = app
-    const tasksActions = require('../actions/tasks')(dispatch)
-    const removeErrorAction = require('../actions/remove-error')(dispatch)
+    const request = require('../request')(dispatch)
 
     next(function () {
-      tasksActions.init()
+      if (!isInited) {
+        isInited = true
+
+        request('/api/tasks', {}).then((tasks) => {
+          dispatch('tasks', 'populate', tasks)
+        })
+      }
     })
 
     return html`<div>
@@ -38,7 +44,7 @@ module.exports = function () {
 
     function removeError (error) {
       return function () {
-        removeErrorAction(error)
+        dispatch('errors', 'remove', error)
       }
     }
   }

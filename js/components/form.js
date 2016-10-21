@@ -4,7 +4,7 @@ const diff = require('diffhtml')
 const html = diff.html
 
 module.exports = function ({dispatch, next, show}, task) {
-  const tasksActions = require('../actions/tasks')(dispatch, show)
+  const request = require('../request')(dispatch)
 
   next(function (target) {
     const form = target.querySelector('form')
@@ -23,21 +23,46 @@ module.exports = function ({dispatch, next, show}, task) {
         <input class="p1 input bold" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
       </label>
       <div class="mb1 right-align">
-        <button class="btn btn-primary bg-maroon" type="submit">Save</button>
-        ${task ? html`<span> </span><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button>` : ''}
+        ${task ? html`<span class="px1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button></span>` : ''}
+        <span class="px1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></span>
       </div>
     </div>
   </form>`
 
   function create (e) {
-    tasksActions.create(this.title.value)
+    show('/')
+
+    const title = this.title.value
+
+    request('/api/tasks', {
+      method: 'post',
+      body: {title}
+    }).then((id) => {
+      dispatch('tasks', 'save', {id, title})
+    })
   }
 
   function save (e) {
-    tasksActions.save(task.id, this.title.value)
+    show('/')
+
+    const title = this.title.value
+    const id = task.id
+
+    request('/api/tasks/' + id, {
+      method: 'put',
+      body: {title}
+    }).then(() => {
+      dispatch('tasks', 'save', {id, title})
+    })
   }
 
   function remove (e) {
-    tasksActions.remove(task.id)
+    show('/')
+
+    const id = task.id
+
+    request('/api/tasks/' + id, {method: 'delete'}).then(() => {
+      dispatch('tasks', 'remove', {id})
+    })
   }
 }
