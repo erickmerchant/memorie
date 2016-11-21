@@ -47,7 +47,7 @@
     "standard": "^8.0.0",
     "thenify": "^3.2.0",
     "transform-tagged-diffhtml": "^1.0.0-rc.4",
-    "whatwg-fetch": "^1.0.0"
+    "whatwg-fetch": "^2.0.1"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
