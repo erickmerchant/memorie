@@ -18,7 +18,7 @@ function js () {
 
   bundle.require('whatwg-fetch')
   bundle.add('js/app.js')
-  bundle.plugin(minifyify, { map: '/app.map', output: 'static/app.map' })
+  bundle.plugin(minifyify, { map: './app.map', output: 'static/app.map' })
   bundle.transform(babelify, { presets: [ 'es2015' ], plugins: ['transform-tagged-diffhtml'] })
   bundle.bundle().pipe(bundleFs)
 
