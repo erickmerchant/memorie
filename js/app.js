@@ -21,7 +21,7 @@ const target = document.querySelector('main')
 
 const diff = require('diffhtml').innerHTML
 
-framework({target, store, component, diff})(function ({dispatch}) {
+framework({target, store, component, diff})(function (dispatch) {
   const request = require('./request')(dispatch)
 
   request('/api/tasks', {}).then((tasks) => {
