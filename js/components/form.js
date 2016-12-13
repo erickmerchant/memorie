@@ -1,3 +1,4 @@
+const ift = require('@erickmerchant/ift')('')
 const scrollIntoView = require('scroll-into-view')
 const preventDefault = require('prevent-default')
 const diff = require('diffhtml')
@@ -6,7 +7,7 @@ const html = diff.html
 module.exports = function ({dispatch, next, show}, task) {
   const request = require('../request')(dispatch)
 
-  next(function (target) {
+  next(function ({target}) {
     const form = target.querySelector('form')
     const input = target.querySelector('input')
 
@@ -20,10 +21,10 @@ module.exports = function ({dispatch, next, show}, task) {
   return html`<form class="left-align col col-12 bg-silver p2" onsubmit=${preventDefault(task ? save : create)}>
     <div class="black pb2 max-width-2 mx-auto">
       <label class="block my2">
-        <input class="p1 input bold" type="text" placeholder="Untitled" name="title" value="${task ? task.title : ''}">
+        <input class="p1 input bold" type="text" placeholder="Untitled" name="title" value="${ift(task, () => task.title)}">
       </label>
       <div class="mb1 right-align">
-        ${task ? html`<span class="px1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button></span>` : ''}
+        ${ift(task, () => html`<span class="px1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button></span>`)}
         <span class="px1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></span>
       </div>
     </div>

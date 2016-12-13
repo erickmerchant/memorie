@@ -1,12 +1,12 @@
 const index = require('./index')
 const rows = require('./rows')
 
-module.exports = function ({params}) {
-  return function (app) {
-    return index()(app, main)
+module.exports = function (app) {
+  const {context} = app
 
-    function main () {
-      return rows(app, parseInt(params.id))
-    }
+  return index(app, main)
+
+  function main () {
+    return rows(app, parseInt(context.params.id))
   }
 }
