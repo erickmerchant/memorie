@@ -19,7 +19,7 @@ const component = router(function (route) {
 
 const target = document.querySelector('main')
 
-const diff = require('diffhtml').innerHTML
+const diff = require('yo-yo').update
 
 framework({target, store, component, diff})(init)
 

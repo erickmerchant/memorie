@@ -1,5 +1,4 @@
-const diff = require('diffhtml')
-const html = diff.html
+const html = require('yo-yo')
 
 module.exports = function (app, size) {
   const borderWidth = Math.ceil(size / 4)

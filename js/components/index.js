@@ -1,13 +1,12 @@
 const ift = require('@erickmerchant/ift')('')
 const rows = require('./rows')
 const spinner = require('./spinner')
-const diff = require('diffhtml')
-const html = diff.html
+const html = require('yo-yo')
 
 module.exports = function (app, main = defaultMain) {
   const {state, dispatch} = app
 
-  return html`<div>
+  return html`<main>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
         <a class="white h3" href="/">Memorie</a>
@@ -28,7 +27,7 @@ module.exports = function (app, main = defaultMain) {
       </div>
     `)}
     ${main(app)}
-  </div>`
+  </main>`
 
   function removeError (error) {
     return function () {

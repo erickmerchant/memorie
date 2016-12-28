@@ -1,6 +1,5 @@
-const diff = require('diffhtml')
 const form = require('./form')
-const html = diff.html
+const html = require('yo-yo')
 
 module.exports = function (app, currentId) {
   const {state} = app
