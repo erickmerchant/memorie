@@ -36,6 +36,7 @@
     "once": "^1.4.0",
     "postcss": "^5.0.19",
     "postcss-calc": "^5.2.1",
+    "postcss-copy": "^6.2.1",
     "postcss-custom-media": "^5.0.1",
     "postcss-custom-properties": "^5.0.0",
     "postcss-import": "^9.0.0",

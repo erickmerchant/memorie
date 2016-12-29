@@ -6,6 +6,7 @@
 @import "basscss-colors";
 @import "basscss-background-colors";
 @import "basscss-border-colors";
+@import "./icons.css";
 
 a {
   text-decoration: none;

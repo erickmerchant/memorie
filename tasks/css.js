@@ -13,7 +13,14 @@ const postcssPlugins = [
   require('postcss-custom-properties')(),
   require('postcss-calc')(),
   require('autoprefixer'),
-  require('cssnano')()
+  require('cssnano')(),
+  require('postcss-copy')({
+    src: 'css',
+    dest: 'static',
+    relativePath (dirname, fileMeta, result, options) {
+      return './static/'
+    }
+  })
 ]
 
 function css () {
@@ -21,7 +28,7 @@ function css () {
   .then(function (css) {
     return postcss(postcssPlugins).process(css, {
       from: 'css/app.css',
-      to: 'static/app.css'
+      to: 'app.css'
     }).then(function (output) {
       return fsWriteFile('static/app.css', output.css)
     })

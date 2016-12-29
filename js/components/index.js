@@ -12,17 +12,17 @@ module.exports = function (app, main = defaultMain) {
         <a class="white h3" href="/">Memorie</a>
       </div>
       <div class="flex-auto justify-center items-center flex">
-        ${ift(state.fetchingCount > 0, () => spinner({html}, 20))}
+        ${ift(state.fetchingCount > 0, () => spinner(app, 20))}
       </div>
       <div class="col-4 right-align">
-        <a class="white" href="/create">Add</a>
+        <a class="white" href="/create"><i class="icon-plus pr1"></i> Add</a>
       </div>
     </div>
     ${[...state.errors].reverse().map((error) => html`
       <div class="clearfix flex items-center m1 p2 bg-fuchsia white">
         <div class="col col-11">${error.message}</div>
-        <div class="col col-1 center">
-          <button class="btn" onclick=${removeError(error)}>x</button>
+        <div class="col col-1 right-align">
+          <button class="btn" onclick=${removeError(error)}><i class="icon-cross"></i></button>
         </div>
       </div>
     `)}

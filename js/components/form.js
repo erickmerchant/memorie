@@ -26,7 +26,7 @@ module.exports = function ({dispatch, next, show}, task) {
       </label>
       <div class="mb1 right-align">
         ${ift(task, () => html`<span class="px1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button></span>`)}
-        <span class="px1"><button class="btn btn-primary bg-maroon" type="submit">Save</button></span>
+        <span class="px1"><button class="btn btn-primary bg-maroon" type="submit"><i class="icon-checkmark pr1"></i> Save</button></span>
       </div>
     </div>
   </form>`
