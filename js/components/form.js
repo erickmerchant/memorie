@@ -20,7 +20,7 @@ module.exports = function ({dispatch, next, show}, task) {
   })
 
   return html`<form class="left-align col col-12 bg-silver p2" onsubmit=${preventDefault(task ? save : create)}>
-    <div class="black pb2 max-width-2 mx-auto">
+    <div class="black max-width-2 mx-auto">
       <label class="block my2">
         <input class="p1 input bold" type="text" placeholder="Untitled" name="title" value="${ift(task, () => task.title)}" onkeyup=${exit} />
       </label>
