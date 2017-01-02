@@ -25,7 +25,7 @@ module.exports = function ({dispatch, next, show}, task) {
         <input class="p1 input bold" type="text" placeholder="Untitled" name="title" value="${ift(task, () => task.title)}" onkeyup=${exit} />
       </label>
       <div class="mb1 right-align">
-        ${ift(task, () => html`<span class="px1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}>Delete</button></span>`)}
+        ${ift(task, () => html`<span class="px1"><button class="btn btn-primary bg-fuchsia" type="button" onclick=${remove}><i class="icon-cross pr1"></i> Delete</button></span>`)}
         <span class="px1"><button class="btn btn-primary bg-maroon" type="submit"><i class="icon-checkmark pr1"></i> Save</button></span>
       </div>
     </div>
