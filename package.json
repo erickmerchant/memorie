@@ -27,7 +27,7 @@
     "bundle-collapser": "^1.2.1",
     "chokidar": "^1.4.3",
     "cssnano": "^3.5.2",
-    "fs-extra": "^1.0.0",
+    "fs-extra": "^2.0.0",
     "hyperxify": "^2.0.1",
     "loading-svg": "^1.0.0",
     "lodash.trim": "^4.2.0",
