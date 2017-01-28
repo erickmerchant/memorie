@@ -23,7 +23,7 @@
     "basscss-btn-primary": "^1.1.0",
     "basscss-colors": "^2.2.0",
     "basscss-forms": "^1.0.0",
-    "browserify": "^13.0.0",
+    "browserify": "^14.0.0",
     "bundle-collapser": "^1.2.1",
     "chokidar": "^1.4.3",
     "cssnano": "^3.5.2",
