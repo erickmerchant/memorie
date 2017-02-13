@@ -51,7 +51,7 @@
     "yo-yo": "^1.3.1"
   },
   "dependencies": {
-    "@erickmerchant/ift": "^1.1.0",
+    "@erickmerchant/ift": "^2.0.1",
     "assert-plus": "^1.0.0",
     "atlatl": "^5.2.0",
     "body-parser": "^1.14.2",

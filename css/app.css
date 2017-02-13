@@ -12,6 +12,10 @@ a {
   text-decoration: none;
 }
 
+.flex-column-reverse {
+  flex-direction: column-reverse;
+}
+
 .field {
   font-family: inherit;
   font-size: inherit;

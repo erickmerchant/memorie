@@ -18,15 +18,19 @@ module.exports = function (app, main = defaultMain) {
         <a class="white" href="/create"><i class="icon-plus pr1"></i> Add</a>
       </div>
     </div>
-    ${[...state.errors].reverse().map((error) => html`
-      <div class="clearfix flex items-center m1 p2 bg-fuchsia white">
-        <div class="col col-11">${error.message}</div>
-        <div class="col col-1 right-align">
-          <button class="btn" onclick=${removeError(error)}><i class="icon-cross"></i></button>
+    <div class="flex flex-column-reverse">
+      ${ift(state.errors, (error) => html`
+        <div class="clearfix flex items-center m1 p2 bg-fuchsia white">
+          <div class="col col-11">${error.message}</div>
+          <div class="col col-1 right-align">
+            <button class="btn" onclick=${removeError(error)}><i class="icon-cross"></i></button>
+          </div>
         </div>
-      </div>
-    `)}
-    ${main(app)}
+      `)}
+    </div>
+    <div class="flex flex-column-reverse">
+      ${main(app)}
+    </div>
   </main>`
 
   function removeError (error) {

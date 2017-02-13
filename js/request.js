@@ -33,6 +33,10 @@ module.exports = function (dispatch) {
       return json
     })
     .catch((error) => {
+      if (error.message != null && error.message === 'Failed to fetch') {
+        error.message = 'Failed to ' + (options.method != null ? options.method.toUpperCase() : 'GET') + ' ' + url
+      }
+
       dispatch('errors', 'add', error)
     })
   }

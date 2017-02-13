@@ -1,10 +1,11 @@
+const ift = require('@erickmerchant/ift')('')
 const form = require('./form')
 const html = require('yo-yo')
 
 module.exports = function (app, currentId) {
   const {state} = app
 
-  return html`${[...state.tasks].reverse().map(([id, task]) => {
+  return html`${ift(state.tasks, ([id, task]) => {
     if (currentId != null && id === currentId) {
       return form(app, task)
     }

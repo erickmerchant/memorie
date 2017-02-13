@@ -7,9 +7,9 @@ module.exports = function (app) {
   return index(app, main)
 
   function main () {
-    return html`${[
-      html`<div id="new">${form(app)}</div>`,
-      rows(app)
-    ]}`
+    return [
+      html`${rows(app)}`,
+      html`<div id="new">${form(app)}</div>`
+    ]
   }
 }
