@@ -3,14 +3,13 @@
 const port = process.env.PORT || 8000
 const databaseURL = process.env.DATABASE_URL
 const staticDirectory = process.env.STATIC_DIRECTORY
-const templateDirectory = process.env.TEMPLATE_DIRECTORY
+const ift = require('@erickmerchant/ift')('')
 const express = require('express')
 const compression = require('compression')
 const bodyParser = require('body-parser')
 const assert = require('assert-plus')
 const morgan = require('morgan')
 const pg = require('pg')
-const atlatl = require('atlatl')({cacheDirectory: './compiled/'})
 const app = express()
 
 pg.connect(databaseURL, function (err, client) {
@@ -18,16 +17,6 @@ pg.connect(databaseURL, function (err, client) {
     return console.error('error fetching client from pool', err)
   }
 
-  app.engine('html', function (filePath, options, callback) {
-    atlatl(filePath)
-    .then(function (template) {
-      callback(null, template.render(options))
-    })
-    .catch(callback)
-  })
-
-  app.set('view engine', 'html')
-  app.set('views', templateDirectory)
   app.set('x-powered-by', false)
 
   app.use(compression())
@@ -126,12 +115,10 @@ pg.connect(databaseURL, function (err, client) {
     res.json({error: err.message})
   })
 
-  app.use('/error', function (req, res, next) {
-    res.render('error')
-  })
-
   app.use('*', function (req, res, next) {
-    res.render('index')
+    res.status(200)
+
+    res.type('html').send(template())
   })
 
   app.use(function (err, req, res, next) {
@@ -140,10 +127,41 @@ pg.connect(databaseURL, function (err, client) {
     }
 
     res.status(500)
-    res.render('error')
+
+    res.type('html').send(template(err))
   })
 
   app.listen(port, function () {
     console.log('server is running at %s', port)
   })
 })
+
+function template (err) {
+  return `<!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Memorie</title>
+        <link href="/favicon.png" rel="shortcut icon" type="image/png">
+        <link rel="stylesheet" href="/app.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+      </head>
+      <body>
+        <main>
+          <div>
+            <div class="flex items-center clearfix white bg-maroon p2 bold">
+              <div class="col-4 left-align">
+                <a class="white h3" href="/">Memorie</a>
+              </div>
+              <div class="flex-auto center">
+              </div>
+              <div class="col-4 right-align">
+              </div>
+            </div>
+            ${ift(err != null, () => `<div class="block m1 p2 bg-fuchsia white">${err.message}</div>`)}
+          </div>
+        </main>
+        ${ift(err == null, `<script src="/app.js"></script>`)}
+      </body>
+    </html>`
+}

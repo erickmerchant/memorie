@@ -18,7 +18,6 @@ module.exports = function serve () {
 
     nodemon({
       ext: 'js,html,css',
-      ignore: [ './compiled/' ],
       environment: environment,
       script: './server.js'
     })
