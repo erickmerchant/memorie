@@ -42,7 +42,7 @@
     "postcss-inherit": "^4.0.1",
     "prevent-default": "^1.0.0",
     "scroll-into-view": "^1.6.0",
-    "sergeant": "^13.0.2",
+    "sergeant": "^14.0.0",
     "simple-fetch": "^1.2.1",
     "standard": "^8.0.0",
     "thenify": "^3.2.0",
