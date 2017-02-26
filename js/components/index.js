@@ -15,13 +15,13 @@ module.exports = function (app) {
   return html`<main>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
-        <a class="white h3" href="/" onclick=${link}>Memorie</a>
+        <a class="white h3" href="/" onclick=${link('/')}>Memorie</a>
       </div>
       <div class="flex-auto justify-center items-center flex">
         ${ift(state.fetchingCount > 0, () => spinner(app, 20))}
       </div>
       <div class="col-4 right-align">
-        <a class="white" href="/create" onclick=${link}><i class="icon-plus pr1"></i> Add</a>
+        <a class="white" href="/create" onclick=${link('/create')}><i class="icon-plus pr1"></i> Add</a>
       </div>
     </div>
     <div class="flex flex-column-reverse">

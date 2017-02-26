@@ -11,6 +11,6 @@ module.exports = function (app, currentId) {
       return form(app, task)
     }
 
-    return html`<a class="col col-12 p2 center border-top border-bottom border-silver block black bold" href="/edit/${task.id}" onclick=${link}>${task.title || 'untitled'}</a>`
+    return html`<a class="col col-12 p2 center border-top border-bottom border-silver block black bold" href="/edit/${task.id}" onclick=${link('/edit/' + task.id)}>${task.title || 'untitled'}</a>`
   })}`
 }
