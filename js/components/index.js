@@ -1,21 +1,27 @@
 const ift = require('@erickmerchant/ift')('')
+const form = require('./form')
 const rows = require('./rows')
 const spinner = require('./spinner')
+const link = require('../link')
 const html = require('yo-yo')
 
-module.exports = function (app, main = defaultMain) {
+module.exports = function (app) {
   const {state, dispatch} = app
+
+  if (state.context.route == null) {
+    return html`<div class="fixed flex items-center justify-center mx-auto top-0 left-0 bottom-0 right-0 bg-maroon">${spinner({html}, 40)}</div>`
+  }
 
   return html`<main>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
-        <a class="white h3" href="/">Memorie</a>
+        <a class="white h3" href="/" onclick=${link}>Memorie</a>
       </div>
       <div class="flex-auto justify-center items-center flex">
         ${ift(state.fetchingCount > 0, () => spinner(app, 20))}
       </div>
       <div class="col-4 right-align">
-        <a class="white" href="/create"><i class="icon-plus pr1"></i> Add</a>
+        <a class="white" href="/create" onclick=${link}><i class="icon-plus pr1"></i> Add</a>
       </div>
     </div>
     <div class="flex flex-column-reverse">
@@ -29,7 +35,19 @@ module.exports = function (app, main = defaultMain) {
       `)}
     </div>
     <div class="flex flex-column-reverse">
-      ${main(app)}
+      ${ift(state.context, (context) => {
+        switch (context.route) {
+          case 'create':
+            return [
+              html`${rows(app)}`,
+              html`<div id="new">${form(app)}</div>`
+            ]
+          case 'edit/:id':
+            return rows(app, parseInt(context.params.id))
+          default:
+            return rows(app)
+        }
+      })}
     </div>
   </main>`
 
@@ -38,8 +56,4 @@ module.exports = function (app, main = defaultMain) {
       dispatch('errors', 'remove', error)
     }
   }
-}
-
-function defaultMain (app) {
-  return rows(app)
 }

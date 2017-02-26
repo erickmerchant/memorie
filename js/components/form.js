@@ -2,8 +2,9 @@ const ift = require('@erickmerchant/ift')('')
 const scrollIntoView = require('scroll-into-view')
 const preventDefault = require('prevent-default')
 const html = require('yo-yo')
+const history = require('../history')
 
-module.exports = function ({dispatch, next, show}, task) {
+module.exports = function ({dispatch, next}, task) {
   const request = require('../request')(dispatch)
 
   next(function ({target}) {
@@ -33,12 +34,12 @@ module.exports = function ({dispatch, next, show}, task) {
 
   function exit (e) {
     if (e.keyCode === 27) {
-      show('/')
+      history.push('/', {})
     }
   }
 
   function create (e) {
-    show('/')
+    history.push('/', {})
 
     const title = this.title.value
 
@@ -51,7 +52,7 @@ module.exports = function ({dispatch, next, show}, task) {
   }
 
   function save (e) {
-    show('/')
+    history.push('/', {})
 
     const title = this.title.value
     const id = task.id
@@ -65,7 +66,7 @@ module.exports = function ({dispatch, next, show}, task) {
   }
 
   function remove (e) {
-    show('/')
+    history.push('/', {})
 
     const id = task.id
 
