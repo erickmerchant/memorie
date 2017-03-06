@@ -2,8 +2,9 @@ const ift = require('@erickmerchant/ift')('')
 const form = require('./form')
 const rows = require('./rows')
 const spinner = require('./spinner')
-const link = require('../link')
 const html = require('yo-yo')
+const history = require('../history')
+const preventDefault = require('prevent-default')
 
 module.exports = function (app) {
   const {state, dispatch} = app
@@ -15,13 +16,17 @@ module.exports = function (app) {
   return html`<main>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
-        <a class="white h3" href="/" onclick=${link('/')}>Memorie</a>
+        <a class="white h3" href="/" onclick=${preventDefault(function (e) {
+          history.push('/', {})
+        })}>Memorie</a>
       </div>
       <div class="flex-auto justify-center items-center flex">
         ${ift(state.fetchingCount > 0, () => spinner(app, 20))}
       </div>
       <div class="col-4 right-align">
-        <a class="white" href="/create" onclick=${link('/create')}><i class="icon-plus pr1"></i> Add</a>
+        <a class="white" href="/create" onclick=${preventDefault(function (e) {
+          history.push('/create', {})
+        })}><i class="icon-plus pr1"></i> Add</a>
       </div>
     </div>
     <div class="flex flex-column-reverse">
