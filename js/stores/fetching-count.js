@@ -1,10 +1,12 @@
 module.exports = function (state = 0, action) {
-  if (action === 'increment') {
-    state++
-  }
+  switch (action) {
+    case 'increment':
+      state++
+      break
 
-  if (action === 'decrement') {
-    state--
+    case 'decrement':
+      state--
+      break
   }
 
   return state

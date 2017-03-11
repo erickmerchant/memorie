@@ -1,14 +1,16 @@
 module.exports = function (state = new Map(), action, data) {
-  if (action === 'populate') {
-    state = new Map(data.map((d) => [d.id, d]))
-  }
+  switch (action) {
+    case 'populate':
+      state = new Map(data.map((d) => [d.id, d]))
+      break
 
-  if (action === 'save') {
-    state.set(data.id, data)
-  }
+    case 'save':
+      state.set(data.id, data)
+      break
 
-  if (action === 'remove') {
-    state.delete(data.id)
+    case 'remove':
+      state.delete(data.id)
+      break
   }
 
   return state

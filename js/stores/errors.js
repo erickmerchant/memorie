@@ -1,10 +1,12 @@
 module.exports = function (state = new Set(), action, data) {
-  if (action === 'add') {
-    state.add(data)
-  }
+  switch (action) {
+    case 'add':
+      state.add(data)
+      break
 
-  if (action === 'remove') {
-    state.delete(data)
+    case 'remove':
+      state.delete(data)
+      break
   }
 
   return state
