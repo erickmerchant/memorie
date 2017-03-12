@@ -1,11 +1,11 @@
 const framework = require('@erickmerchant/framework')
 
-const stateContainer = require('@erickmerchant/state-container')
+const combineStores = require('@erickmerchant/combine-stores')
 
-const router = require('@erickmerchant/router')
+const contextStore = require('@erickmerchant/context-store')
 
-const store = stateContainer(function (store) {
-  store('context', router(['', 'create', 'edit/:id']))
+const store = combineStores(function (store) {
+  store('context', contextStore(['', 'create', 'edit/:id']))
   store('errors', require('./stores/errors'))
   store('fetchingCount', require('./stores/fetching-count'))
   store('tasks', require('./stores/tasks'))
