@@ -16,7 +16,7 @@ module.exports = function (app) {
   return html`<main>
     <div class="flex items-center clearfix white bg-maroon p2 bold">
       <div class="col-4 left-align">
-        <a class="white h3" href="/" onclick=${preventDefault(function (e) {
+        <a class="white h3 p2" href="/" onclick=${preventDefault(function (e) {
           history.push('/', {})
         })}>Memorie</a>
       </div>
@@ -24,7 +24,7 @@ module.exports = function (app) {
         ${ift(state.fetchingCount > 0, () => spinner(app, 20))}
       </div>
       <div class="col-4 right-align">
-        <a class="white" href="/create" onclick=${preventDefault(function (e) {
+        <a class="white p2" href="/create" onclick=${preventDefault(function (e) {
           history.push('/create', {})
         })}><i class="icon-plus pr1"></i> Add</a>
       </div>

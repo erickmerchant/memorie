@@ -11,6 +11,9 @@ const assert = require('assert-plus')
 const morgan = require('morgan')
 const pg = require('pg')
 const app = express()
+const spawnSync = require('child_process').spawnSync
+
+spawnSync('postgres', ['-D', '/usr/local/var/postgres'])
 
 pg.connect(databaseURL, function (err, client) {
   if (err) {
@@ -151,7 +154,7 @@ function template (err) {
           <div>
             <div class="flex items-center clearfix white bg-maroon p2 bold">
               <div class="col-4 left-align">
-                <a class="white h3" href="/">Memorie</a>
+                <a class="white h3 p2" href="/">Memorie</a>
               </div>
               <div class="flex-auto center">
               </div>
