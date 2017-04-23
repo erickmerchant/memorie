@@ -11,9 +11,6 @@ const assert = require('assert-plus')
 const morgan = require('morgan')
 const pg = require('pg')
 const app = express()
-const spawnSync = require('child_process').spawnSync
-
-spawnSync('postgres', ['-D', '/usr/local/var/postgres'])
 
 pg.connect(databaseURL, function (err, client) {
   if (err) {

@@ -7,7 +7,7 @@
     "cpy": "cpy node_modules/loading-svg/loading-bars.svg static",
     "build": "npm run cpy && assets static",
     "watch": "npm run cpy & assets static -w & npm run serve",
-    "serve": "node -r dotenv/config server.js"
+    "serve": "postgres -D /usr/local/var/postgres & node -r dotenv/config server.js"
   },
   "author": "Erick Merchant <erick.merchant@gmail.com>",
   "license": "MIT",
