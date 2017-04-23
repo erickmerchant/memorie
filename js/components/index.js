@@ -44,7 +44,7 @@ module.exports = function (app) {
         switch (context.route) {
           case 'create':
             return [
-              html`${rows(app)}`,
+              rows(app),
               html`<div id="new">${form(app)}</div>`
             ]
           case 'edit/:id':
