@@ -2,7 +2,7 @@ const ift = require('@erickmerchant/ift')('')
 const form = require('./form')
 const rows = require('./rows')
 const spinner = require('./spinner')
-const html = require('yo-yo')
+const html = require('bel')
 const history = require('../history')
 const preventDefault = require('prevent-default')
 

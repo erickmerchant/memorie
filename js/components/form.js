@@ -1,7 +1,7 @@
 const ift = require('@erickmerchant/ift')('')
 const scrollIntoView = require('scroll-into-view')
 const preventDefault = require('prevent-default')
-const html = require('yo-yo')
+const html = require('bel')
 const history = require('../history')
 
 module.exports = function ({dispatch, next}, task) {

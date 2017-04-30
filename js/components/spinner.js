@@ -1,4 +1,4 @@
-const html = require('yo-yo')
+const html = require('bel')
 
 module.exports = function (app, size) {
   const borderWidth = Math.ceil(size / 4)

@@ -15,7 +15,7 @@ const component = require('./components/index')
 
 const target = document.querySelector('main')
 
-const diff = require('yo-yo').update
+const diff = require('nanomorph')
 
 framework({target, store, component, diff})(init)
 

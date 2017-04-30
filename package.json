@@ -24,18 +24,20 @@
     "basscss-btn-primary": "^1.1.0",
     "basscss-colors": "^2.2.0",
     "basscss-forms": "^1.0.0",
+    "bel": "^4.6.0",
     "cpy-cli": "^1.0.1",
     "history": "^4.5.1",
     "loading-svg": "^1.0.0",
+    "nanomorph": "^4.0.5",
     "prevent-default": "^1.0.0",
     "scroll-into-view": "^1.6.0",
-    "standard": "^10.0.0",
-    "yo-yo": "^1.3.1"
+    "standard": "^10.0.0"
   },
   "dependencies": {
     "@erickmerchant/ift": "^2.0.2",
     "assert-plus": "^1.0.0",
     "body-parser": "^1.14.2",
+    "chalk": "^1.1.3",
     "compression": "^1.6.1",
     "dotenv": "^4.0.0",
     "express": "^4.13.3",

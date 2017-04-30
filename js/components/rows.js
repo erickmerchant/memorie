@@ -2,7 +2,7 @@ const ift = require('@erickmerchant/ift')('')
 const form = require('./form')
 const history = require('../history')
 const preventDefault = require('prevent-default')
-const html = require('yo-yo')
+const html = require('bel')
 
 module.exports = function (app, currentId) {
   const {state} = app

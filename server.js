@@ -9,6 +9,7 @@ const compression = require('compression')
 const bodyParser = require('body-parser')
 const assert = require('assert-plus')
 const morgan = require('morgan')
+const chalk = require('chalk')
 const pg = require('pg')
 const app = express()
 
@@ -132,7 +133,7 @@ pg.connect(databaseURL, function (err, client) {
   })
 
   app.listen(port, function () {
-    console.log('server is running at %s', port)
+    console.log(chalk.green('\u2714') + ' server is running at %s', port)
   })
 })
 
