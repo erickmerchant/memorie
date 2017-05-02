@@ -7,9 +7,9 @@ const history = require('../history')
 const preventDefault = require('prevent-default')
 
 module.exports = function (app) {
-  const {state, dispatch} = app
+  const {state, dispatch, route} = app
 
-  if (state.context.route == null) {
+  if (state.location == null) {
     return html`<div class="fixed flex items-center justify-center mx-auto top-0 left-0 bottom-0 right-0 bg-maroon">${spinner({html}, 40)}</div>`
   }
 
@@ -40,18 +40,15 @@ module.exports = function (app) {
       `)}
     </div>
     <div class="flex flex-column-reverse">
-      ${ift(state.context, (context) => {
-        switch (context.route) {
-          case 'create':
-            return [
-              rows(app),
-              html`<div id="new">${form(app)}</div>`
-            ]
-          case 'edit/:id':
-            return rows(app, parseInt(context.params.id))
-          default:
-            return rows(app)
-        }
+      ${route(state.location, (on) => {
+        on('create', () => [
+          rows(app),
+          html`<div id="new">${form(app)}</div>`
+        ])
+
+        on('edit/:id', (params) => rows(app, parseInt(params.id)))
+
+        on(() => rows(app))
       })}
     </div>
   </main>`
