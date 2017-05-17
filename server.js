@@ -144,7 +144,7 @@ function template (err) {
         <meta charset="UTF-8">
         <title>Memorie</title>
         <link href="/favicon.png" rel="shortcut icon" type="image/png">
-        <link rel="stylesheet" href="/app.css">
+        <link rel="stylesheet" href="/bundle.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
       </head>
       <body>
@@ -162,7 +162,7 @@ function template (err) {
             ${ift(err != null, () => `<div class="block m1 p2 bg-fuchsia white">${err.message}</div>`)}
           </div>
         </main>
-        ${ift(err == null, `<script src="/app.js"></script>`)}
+        ${ift(err == null, `<script src="/bundle.js"></script>`)}
       </body>
     </html>`
 }
