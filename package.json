@@ -29,7 +29,7 @@
     "bel": "^5.0.0",
     "history": "^4.5.1",
     "loading-svg": "^1.0.0",
-    "nanomorph": "^4.0.5",
+    "nanomorph": "^5.0.0",
     "prevent-default": "^1.0.0",
     "scroll-into-view": "^1.6.0",
     "standard": "^10.0.0"
